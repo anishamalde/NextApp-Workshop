@@ -1,36 +1,12 @@
 # Step 1: Set up and run the app
 
-In this step you'll install the Vega SDK, clone this repo, and get the app running on both Fire TV and web.
+In this step you'll get the app running on both Fire TV and web.
 
-## 1.1 Install the Vega SDK
+> **Before you start:** Make sure you've completed [Step 0: Prerequisites](./step-00-prerequisites.md). You'll need the Vega SDK installed, Yarn configured, and dependencies installed.
+>
+> Every command used in this workshop, plus common fixes, lives in [Commands and troubleshooting](./commands-and-troubleshooting.md). Keep it open in another tab.
 
-Follow the official guides to get the Vega developer tools set up:
-
-1. **[Install the Vega Developer Tools](https://developer.amazon.com/docs/vega/latest/install-vega-sdk.html)** - installs the `vega` CLI, the Vega Virtual Device, and React Native Kepler
-2. **[Configure Yarn for Vega](https://developer.amazon.com/docs/vega/latest/configure-package-managers.html)** - sets up Yarn to resolve Amazon device packages
-
-## 1.2 Verify your environment
-
-```bash
-# Vega CLI installed
-vega --version
-
-# Node.js 18+
-node --version
-
-# Yarn 4+
-yarn --version
-```
-
-## 1.3 Install dependencies
-
-From the root of this repo, install all workspace dependencies:
-
-```bash
-yarn
-```
-
-## 1.4 Understand the project structure
+## 1.1 Understand the project structure
 
 This is a Yarn workspaces monorepo, already configured and ready to go. You don't need to set any of this up - it's here so you can focus on building components.
 
@@ -64,13 +40,34 @@ export const App = () => {
 
 Simple: it renders the shared `HomeScreen` inside a background image.
 
-## 1.5 Run on Vega (Fire TV)
+## 1.2 Run on Vega (Fire TV)
 
-Build the app:
+You can build and run using either the CLI or the [Vega Studio IDE extension](https://developer.amazon.com/docs/vega/0.22/setup-extension.html). We recommend the IDE, which provides build, run, and device management directly from the sidebar panel. Vega Studio also has [monorepo support](https://developer.amazon.com/docs/vega/0.22/monorepo-support.html) that automatically detects the workspace layout and imports Vega sub-packages when you open the project.
+
+### Option A: Build and run from Vega Studio IDE
+
+Open the project in your IDE, then use the Vega Studio sidebar to pick a build mode and run the app.
+
+![Vega Studio sidebar showing the project, build modes, and run controls](./images/step-01-vega-studio-ide.png)
+
+Pick **Debug** during development (enables Fast Refresh), or **Release** for a production-style build. From here you can build, deploy, and manage devices without leaving the IDE.
+
+### Option B: Build and run from the CLI
+
+#### Build the app
 
 ```bash
+# Debug build (recommended for development, enables Fast Refresh)
+yarn workspace @multitv/vega run build:debug
+
+# Release build
+yarn workspace @multitv/vega run build:release
+
+# Or use the shorthand
 yarn vega:build
 ```
+
+#### Run on a Vega Virtual Device
 
 Start the Vega Virtual Device:
 
@@ -78,23 +75,56 @@ Start the Vega Virtual Device:
 vega virtual-device start
 ```
 
-Run the app:
+Then run the app:
 
 ```bash
-# Mac M-series (Apple Silicon)
+# Mac M-series (Apple Silicon) - using yarn script
 yarn vega:vvd:mseries
 
-# Intel Mac
+# Intel Mac - using yarn script
 yarn vega:vvd:intel
+
+# Or directly with the Vega CLI
+# Mac M-series (aarch64)
+vega run-app packages/vega/build/aarch64-debug/vega_aarch64.vpkg com.amazondeveloper.hellosharedworkspace.main -d VirtualDevice
+
+# Intel Mac (x86_64)
+vega run-app packages/vega/build/x86_64-debug/vega_x86_64.vpkg com.amazondeveloper.hellosharedworkspace.main -d VirtualDevice
 ```
 
 You should see a tile-based UI with four tiles: Home, Get Started, Test & Debug, and Learn More. Use the arrow keys (D-pad) to navigate between them.
 
 ![App running on the Vega Virtual Device](./images/step-01-vega-running.png)
 
-## 1.6 Run on another platform
+#### Run on a Fire TV Stick
+
+Replace `<DSN>` with your device serial number:
+
+```bash
+# Using the yarn script
+yarn vega:firetv <DSN>
+
+# Or directly
+vega run-app packages/vega/build/armv7-release/vega_armv7.vpkg com.amazondeveloper.hellosharedworkspace.main -d <DSN>
+```
+
+The `vega run-app` command takes the form `vega run-app <Vpkg path> <App ID> -d <device>`. The App ID is the interactive component id from `manifest.toml` (here, `com.amazondeveloper.hellosharedworkspace.main`). Use `VirtualDevice` for the VVD or the device serial number (DSN) for a Fire TV Stick. See the [Vega CLI reference](https://developer.amazon.com/docs/vega/0.22/cli-tools.html) for details.
+
+[Fast Refresh](https://reactnative.dev/docs/fast-refresh) is available in debug builds. See [Set Up Fast Refresh](https://developer.amazon.com/docs/vega/latest/fast-refresh.html) for configuration.
+
+## 1.3 Run on another platform
 
 The same shared code also runs via the Expo TV package. For this workshop we'll use web as the second target since it requires no additional setup, but if you have Android Studio or are comfortable with Xcode, you can target Android TV or Apple TV too.
+
+> **Note:** Apple TV (iOS) must run on port 8081. Avoid running Vega and Expo TV builds at the same time, as they use separate Metro instances that can conflict.
+
+Prebuild the native projects first (only needed for Android TV and Apple TV):
+
+```bash
+yarn expotv:prebuild
+```
+
+Then run on your target platform:
 
 **Web (no extra setup needed):**
 ```bash
@@ -103,13 +133,11 @@ yarn expotv:web
 
 **Android TV (requires Android Studio with a TV system image):**
 ```bash
-yarn expotv:prebuild
 yarn expotv:android
 ```
 
 **Apple TV (requires Xcode):**
 ```bash
-yarn expotv:prebuild
 yarn expotv:ios
 ```
 
