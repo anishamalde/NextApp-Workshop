@@ -273,4 +273,4 @@ Same behaviour, same API call, same component. No platform differences needed fo
 
 ---
 
-**Next:** Check out the `main` branch to see the complete app with all tiles and the full Expo TV setup for Android TV and Apple TV.
+**Next:** [Step 5: Replace Test & Debug with a movie list →](./step-05-movie-list.md)
