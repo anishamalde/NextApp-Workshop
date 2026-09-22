@@ -1,6 +1,7 @@
 import React, {useState, useCallback} from 'react';
 import {StyleSheet, Text, ImageBackground, View} from 'react-native';
 import {Tile} from '../components/Tile';
+import {MovieList} from '../components/MovieList/MovieList';
 import {tiles} from '../data/tiles';
 import {ApiDemo} from '../components/ApiDemo';
 import {IconReactNativeAnimated} from '../components/IconReactNativeAnimated/IconReactNativeAnimated';
@@ -24,6 +25,10 @@ export const HomeScreen = () => {
   const renderFocusedContent = () => {
     if (focusedTileId === 'home') {
       return <Header />;
+    }
+
+    if (focusedTileId === 'movies') {
+      return <MovieList />;
     }
 
     return (

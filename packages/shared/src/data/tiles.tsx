@@ -35,11 +35,11 @@ export const tiles: TileData[] = [
     icon: require('../assets/get-started.png'),
   },
   {
-    id: 'debug',
-    label: 'Test &\nDebug',
-    accessibilityLabel: 'Test and Debug',
+    id: 'movies',
+    label: 'Movies',
+    accessibilityLabel: 'Movies',
     description:
-      "Press 'd' in the Metro terminal for the developer menu, or debug via Chrome Dev Tools in Vega Studio.",
+      'A horizontal list of movies from a local catalog. FlatList on Expo TV and web, Carousel on Vega.',
     icon: require('../assets/debug.png'),
   },
   {

@@ -31,6 +31,7 @@ Along the way you'll learn:
 | [Step 2: Add a shared Header](./workshop/step-02-shared-header.md)    | Create a Header component with platform-specific logos     | File extensions vs. Platform.select(), platform resolution |
 | [Step 3: Add a Lottie animation](./workshop/step-03-add-animation.md) | Add an animated React Native logo with a web fallback      | Native modules, platform-specific fallbacks, Lottie        |
 | [Step 4: Add an API demo](./workshop/step-04-add-api-demo.md)         | Fetch data from a public API in a shared component         | Network requests, shared utilities, fetch across platforms |
+| [Step 5: Movie list](./workshop/step-05-movie-list.md)                | Replace Test & Debug with a movie list, FlatList vs Carousel | Reusing the shared httpClient, TV list performance, platform-specific list components |
 
 The `final-app` branch contains the completed version with all steps applied. Compare your progress at any point by checking out `final-app`.
 
