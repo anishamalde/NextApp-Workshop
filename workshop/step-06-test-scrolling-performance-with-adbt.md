@@ -97,12 +97,14 @@ These steps follow Amazon's [Measure App KPIs](https://developer.amazon.com/docs
 
 ## 6.4 Measure FlatList
 
-Vega normally selects `MovieList.kepler.tsx`, which uses the Carousel. Temporarily move that file so Vega falls back to the shared `MovieList.tsx` implementation:
+Vega automatically selects `MovieList.kepler.tsx`, which uses the Carousel. This is the same platform file resolution you used for the Header.
+
+To switch to `FlatList`, hide the Vega-specific file by temporarily renaming it. Do not delete it. With the `.kepler.tsx` file hidden, Vega falls back to the shared `MovieList.tsx` implementation:
 
 ```bash
 mv \
   packages/shared/src/components/MovieList/MovieList.kepler.tsx \
-  packages/shared/src/components/MovieList/MovieList.kepler.tsx.carousel
+  packages/shared/src/components/MovieList/MovieList.kepler.tsx.hidden
 ```
 
 Build and install the Release app:
@@ -124,7 +126,7 @@ Restore the Vega-specific file:
 
 ```bash
 mv \
-  packages/shared/src/components/MovieList/MovieList.kepler.tsx.carousel \
+  packages/shared/src/components/MovieList/MovieList.kepler.tsx.hidden \
   packages/shared/src/components/MovieList/MovieList.kepler.tsx
 ```
 
