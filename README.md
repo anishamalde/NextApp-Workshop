@@ -11,6 +11,9 @@ You start with a working monorepo that already has a simple tile-based UI. The p
 - A shared `Header` component that shows a different logo per platform
 - A Lottie-powered animated logo with a web fallback
 - A shared API demo that fetches data from a public endpoint
+- A horizontal movie list using `FlatList` or the Vega Carousel
+- A measured UI-fluidity baseline for scrolling on a physical Vega device
+- A prompt-driven streaming TV browse and playback capstone
 - The same app running on multiple TV platforms and the web
 
 Along the way you'll learn:
@@ -21,6 +24,8 @@ Along the way you'll learn:
 - Two approaches to platform-specific code: file extensions (`.kepler.tsx`, `.web.tsx`) vs. `Platform.select()`
 - Adding native modules (Lottie animations) with platform-specific fallbacks
 - Sharing network logic and utilities across all platforms
+- Measuring scrolling performance with Amazon Devices Builder Tools
+- Using an AI coding assistant with a structured implementation prompt
 
 ## Workshop steps
 
@@ -32,6 +37,8 @@ Along the way you'll learn:
 | [Step 3: Add a Lottie animation](./workshop/step-03-add-animation.md) | Add an animated React Native logo with a web fallback      | Native modules, platform-specific fallbacks, Lottie        |
 | [Step 4: Add an API demo](./workshop/step-04-add-api-demo.md)         | Fetch data from a public API in a shared component         | Network requests, shared utilities, fetch across platforms |
 | [Step 5: Movie list](./workshop/step-05-movie-list.md)                | Replace Test & Debug with a movie list, FlatList vs Carousel | Reusing the shared httpClient, TV list performance, platform-specific list components |
+| [Step 6: Test scrolling performance with ADBT](./workshop/step-06-test-scrolling-performance-with-adbt.md) | Measure the movie list on a physical Vega device | UI fluidity KPIs, CPU traces, hot-function analysis |
+| [Step 7: Build a streaming TV experience](./workshop/step-07-build-streaming-tv-experience.md) | Apply `workshop/prompts/streaming-tv-prompt.txt` with an AI coding assistant | 10-foot UI, TV focus, shared playback interfaces, validation |
 
 The `final-app` branch contains the completed version with all steps applied. Compare your progress at any point by checking out `final-app`.
 
