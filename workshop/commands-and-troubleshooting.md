@@ -42,7 +42,7 @@ If Metro fails to resolve dependencies, check that `watchFolders` and `nodeModul
 ### Vega build issues
 
 Make sure the Vega CLI tools are installed and configured correctly.
-See [Vega CLI Installation](https://developer.amazon.com/docs/vega/latest/install-vega-sdk.html).
+See [Vega CLI Installation](https://developer.amazon.com/docs/vega/0.24/install-vega-sdk.html).
 
 ### Fast Refresh not working
 

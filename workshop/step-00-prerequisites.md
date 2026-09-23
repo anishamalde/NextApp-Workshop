@@ -55,8 +55,8 @@ ADBT will install the `vega` CLI, the Vega Virtual Device, React Native Kepler, 
 
 Follow the official guides:
 
-1. **[Install the Vega Developer Tools](https://developer.amazon.com/docs/vega/latest/install-vega-sdk.html)** - installs the `vega` CLI, the Vega Virtual Device, and React Native Kepler
-2. **[Configure Yarn for Vega](https://developer.amazon.com/docs/vega/latest/configure-package-managers.html)** - sets up Yarn to resolve Amazon device packages
+1. **[Install the Vega Developer Tools](https://developer.amazon.com/docs/vega/0.24/install-vega-sdk.html)** - installs the `vega` CLI, the Vega Virtual Device, and React Native Kepler
+2. **[Configure Yarn for Vega](https://developer.amazon.com/docs/vega/0.24/configure-package-managers.html)** - sets up Yarn to resolve Amazon device packages
 
 ## 0.4 Optional: Expo TV targets
 

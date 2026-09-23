@@ -11,93 +11,30 @@ Create `packages/shared/src/services/httpClient.ts`:
 ```ts
 export interface HttpClientConfig {
   baseUrl?: string;
-  timeout?: number;
-  headers?: Record<string, string>;
 }
 
 export interface HttpResponse<T = unknown> {
   data: T;
-  status: number;
-  headers: Record<string, string>;
   ok: boolean;
+  status: number;
 }
 
-export class HttpClient {
-  private baseUrl: string;
-  private timeout: number;
-  private defaultHeaders: Record<string, string>;
+export function createHttpClient(config: HttpClientConfig = {}) {
+  const baseUrl = config.baseUrl ?? '';
+  const buildUrl = (path: string) =>
+    /^https?:\/\//.test(path) ? path : `${baseUrl}${path}`;
 
-  constructor(config: HttpClientConfig = {}) {
-    this.baseUrl = config.baseUrl || '';
-    this.timeout = config.timeout || 30000;
-    this.defaultHeaders = config.headers || {};
-  }
-
-  private buildUrl(path: string): string {
-    if (path.startsWith('http://') || path.startsWith('https://')) {
-      return path;
-    }
-    return `${this.baseUrl}${path}`;
-  }
-
-  private async request<T>(
-    method: string,
-    path: string,
-    options?: {body?: unknown; query?: Record<string, unknown>},
-  ): Promise<HttpResponse<T>> {
-    let url = this.buildUrl(path);
-    if (options?.query) {
-      const params = new URLSearchParams();
-      for (const [key, value] of Object.entries(options.query)) {
-        params.append(key, String(value));
-      }
-      url += `?${params.toString()}`;
-    }
-
-    const fetchOptions: RequestInit = {method};
-
-    if (options?.body) {
-      fetchOptions.headers = {
-        'Content-Type': 'application/json',
-        ...this.defaultHeaders,
-      };
-      fetchOptions.body = JSON.stringify(options.body);
-    } else if (Object.keys(this.defaultHeaders).length > 0) {
-      fetchOptions.headers = this.defaultHeaders;
-    }
-
-    const response = await fetch(url, fetchOptions);
-    const data = await response.json().catch(() => null);
-
-    return {
-      data: data as T,
-      status: response.status,
-      headers: {},
-      ok: response.ok,
-    };
-  }
-
-  async get<T = unknown>(
-    path: string,
-    query?: Record<string, unknown>,
-  ): Promise<HttpResponse<T>> {
-    return this.request<T>('GET', path, {query});
-  }
-
-  async post<T = unknown>(
-    path: string,
-    body?: unknown,
-  ): Promise<HttpResponse<T>> {
-    return this.request<T>('POST', path, {body});
-  }
-}
-
-export function createHttpClient(config?: HttpClientConfig): HttpClient {
-  return new HttpClient(config);
+  return {
+    async get<T = unknown>(path: string): Promise<HttpResponse<T>> {
+      const response = await fetch(buildUrl(path));
+      const data = (await response.json().catch(() => null)) as T;
+      return {data, ok: response.ok, status: response.status};
+    },
+  };
 }
 ```
 
-This is a thin wrapper around `fetch` that works on both Vega and web. No platform-specific code needed - `fetch` is available everywhere.
+This is a thin wrapper around `fetch` that works on both Vega and web. No platform-specific code needed — `fetch` is available everywhere. You can extend it later (POST, custom headers, timeouts via `AbortController`) once you actually need those; this workshop only needs `GET`.
 
 ## 4.2 Create the ApiDemo component
 
@@ -248,7 +185,8 @@ export type {HttpClientConfig, HttpResponse} from './src/services/httpClient';
 
 ## 4.6 Run and verify
 
-Build and run on Vega:
+Build and run on Vega. In Vega Studio, click the play button in the sidebar (see [Step 1](./step-01-setup-and-run.md#option-a-build-and-run-from-vega-studio-ide)). Or from the CLI:
+
 ```bash
 yarn vega:build
 yarn vega:vvd:mseries
@@ -262,6 +200,8 @@ Run on web:
 ```bash
 yarn expotv:web
 ```
+
+Or run on Android TV (`yarn expotv:android`) or Apple TV (`yarn expotv:ios`) if you have those emulators set up. See [Step 1: Run on another platform](./step-01-setup-and-run.md#13-run-on-another-platform).
 
 Same behaviour, same API call, same component. No platform differences needed for network requests.
 

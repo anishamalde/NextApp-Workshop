@@ -33,7 +33,7 @@ export interface Catalog {
 
 const CATALOG_URL = 'https://giolaq.github.io/scrap-tv-feed/catalog.json';
 
-const catalogClient = createHttpClient({timeout: 10000});
+const catalogClient = createHttpClient();
 
 export async function fetchCatalog(): Promise<Catalog> {
   const response = await catalogClient.get<Catalog>(CATALOG_URL);
@@ -57,13 +57,13 @@ export function useMovies(): UseMoviesResult {
   useEffect(() => {
     let cancelled = false;
     fetchCatalog()
-      .then(catalog => {
+      .then((catalog) => {
         if (!cancelled) {
           setMovies(catalog.items);
           setLoading(false);
         }
       })
-      .catch(err => {
+      .catch((err) => {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : 'Unknown error');
           setLoading(false);
@@ -86,7 +86,7 @@ A few things worth noticing:
 
 ## 5.2 Create a shared MoviePoster component
 
-Every list variant renders the same poster. Create `packages/shared/src/components/MovieList/MoviePoster.tsx`:
+Create `packages/shared/src/components/MovieList/MoviePoster.tsx`:
 
 ```tsx
 import React, {useState, useCallback} from 'react';
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     marginRight: scaleWidth(30),
   },
   containerFocused: {
-    transform: [{scale: 1.05}],
+    transform: [{scale: 1.1}],
   },
   poster: {
     width: scaleWidth(480),
@@ -155,7 +155,7 @@ Same `onFocus`/`onBlur` scaling pattern from earlier steps: when D-pad focus lan
 
 ## 5.3 Create the FlatList variant
 
-Create `packages/shared/src/components/MovieList/MovieList.tsx`. This is the default, used by web, Android TV, and Apple TV:
+Create `packages/shared/src/components/MovieList/MovieList.tsx`. This is the default, used by Web, Android TV, and Apple TV:
 
 ```tsx
 import React from 'react';
@@ -295,7 +295,7 @@ A few things worth noticing:
 - `TVFocusGuideView` with `autoFocus` wraps the Carousel so pressing **Up** from the Movies tile hands focus into the carousel row. Without it, focus would just stay on the tile row.
 - We're relying on defaults for `orientation`, `renderedItemsCount`, `numOffsetItems`, and `initialStartIndex`. All of those are perf knobs you can tune later (see the docs) — the defaults are fine for a 25-item catalog.
 
-For the full prop reference, see the [Vega Carousel docs](https://developer.amazon.com/docs/vega/latest/vega-carousel.html) and [Focus Management on Vega](https://developer.amazon.com/docs/vega/latest/focus-management.html).
+For the full prop reference, see the [Vega Carousel docs](https://developer.amazon.com/docs/vega-api/0.24/vega-carousel.html) and [Focus Management on Vega](https://developer.amazon.com/docs/vega/0.24/focus-management.html).
 
 ## 5.5 Add the Vega Carousel dependency
 
@@ -389,7 +389,7 @@ export type {Movie, Catalog} from './src/data/catalog';
 
 ## 5.9 Run and compare
 
-Build and run on Vega:
+Build and run on Vega. In Vega Studio, click the play button in the sidebar (see [Step 1](./step-01-setup-and-run.md#option-a-build-and-run-from-vega-studio-ide)). Or from the CLI:
 
 ```bash
 yarn vega:build
@@ -398,11 +398,15 @@ yarn vega:vvd:mseries  # or yarn vega:vvd:intel
 
 Focus the **Movies** tile. You should see a spinner briefly, then a horizontal carousel of posters. Use the D-pad to scroll left and right, and watch how the focused poster scales up.
 
+![Movies tile focused, showing the Carousel of posters on the Vega Virtual Device](./images/step-05-movies-vega.png)
+
 Now run on web:
 
 ```bash
 yarn expotv:web
 ```
+
+Or run on Android TV (`yarn expotv:android`) or Apple TV (`yarn expotv:ios`) if you have those emulators set up. See [Step 1: Run on another platform](./step-01-setup-and-run.md#13-run-on-another-platform).
 
 Same fetch, same posters, but rendered by `FlatList`. Scroll with the arrow keys.
 
