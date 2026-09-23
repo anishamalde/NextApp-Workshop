@@ -6,6 +6,14 @@ In this step, you'll add an animated React Native logo using [Lottie](https://ai
 
 The Vega package already has `@amazon-devices/lottie-react-native` as a dependency (check `packages/vega/package.json`). This is a Vega compatible version of the popular `lottie-react-native` library.
 
+The starter has this installed for you. If you were adding it yourself, you'd run:
+
+```bash
+yarn workspace @multitv/vega add @amazon-devices/lottie-react-native
+```
+
+Any `@amazon-devices/*` package works the same way — that's how you pull in Vega-specific native modules like the Carousel you'll use in Step 5.
+
 The shared package lists `lottie-react-native` as a peer dependency, and the Vega Metro config aliases it to the Amazon Devices version:
 
 ```js
@@ -53,50 +61,19 @@ const styles = StyleSheet.create({
 });
 ```
 
-**`IconReactNativeAnimated.web.tsx`** (web fallback using React Native's Animated API):
+**`IconReactNativeAnimated.web.tsx`** (empty web fallback):
 
 ```tsx
-import React, {useRef, useEffect} from 'react';
-import {Animated, StyleSheet, Easing} from 'react-native';
-import {scaleWidth, scaleHeight} from '../../utils/scaling';
+import React from 'react';
 
+// Web fallback - Lottie's native renderer isn't available on web,
+// so we render nothing here.
 export const IconReactNativeAnimated = () => {
-  const spinValue = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.timing(spinValue, {
-        toValue: 1,
-        duration: 3000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    ).start();
-  }, [spinValue]);
-
-  const spin = spinValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
-  return (
-    <Animated.Image
-      source={require('../../assets/react-logo.png')}
-      style={[styles.logo, {transform: [{rotate: spin}]}]}
-    />
-  );
+  return <></>;
 };
-
-const styles = StyleSheet.create({
-  logo: {
-    width: scaleWidth(300),
-    height: scaleHeight(300),
-    resizeMode: 'contain',
-  },
-});
 ```
 
-Lottie requires native rendering that isn't available on web, so the web version uses React Native's built-in `Animated` API to spin a static React Native logo instead. Same component name, same import path, completely different implementation. The `react-logo.png` asset is already in `packages/shared/src/assets/`.
+Lottie relies on a native renderer that doesn't exist on web, so the web variant is deliberately empty — the "Animated Demo" tile still focuses and the description text still shows, but nothing spins. Same component name, same import path, completely different implementation. If you wanted a real web animation, you could swap in a CSS keyframe, a WebP loop, or React Native's `Animated` API; the important point is that the shared code doesn't need to know or care.
 
 ## 3.3 Replace the Get Started tile
 
@@ -153,7 +130,7 @@ animationWrapper: {
 
 ## 3.5 Run and verify
 
-Build and run on Vega:
+Build and run on Vega. In Vega Studio, click the play button in the sidebar (see [Step 1](./step-01-setup-and-run.md#option-a-build-and-run-from-vega-studio-ide)). Or from the CLI:
 
 ```bash
 yarn vega:build
@@ -170,7 +147,9 @@ Run on web:
 yarn expotv:web
 ```
 
-Navigate to the "Animated Demo" tile. You should see a spinning React Native logo. On Vega it's a Lottie animation, on web it's React Native's `Animated` API rotating a static image. Same component name, same import, different implementation per platform.
+Or run on Android TV (`yarn expotv:android`) or Apple TV (`yarn expotv:ios`) if you have those emulators set up. See [Step 1: Run on another platform](./step-01-setup-and-run.md#13-run-on-another-platform).
+
+Navigate to the "Animated Demo" tile. On Vega you'll see the Lottie animation spinning. On web there's no animation — the tile is still selectable, the description still shows, but `IconReactNativeAnimated` renders nothing. Same component name, same import **path**, completely different implementation. HomeScreen imports `IconReactNativeAnimated` once; Metro picks the `.web.tsx` or `.kepler.tsx` file behind the scenes.
 
 ![Animated demo running on web](./images/step-03-animation-web.gif)
 

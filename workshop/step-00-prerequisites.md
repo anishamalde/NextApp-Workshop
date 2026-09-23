@@ -15,8 +15,6 @@ You'll need the following on your machine:
 
 ADBT is the agentic tooling for Vega development. It exposes an MCP server that your AI assistant (Claude, Cursor, etc.) can talk to, so you can prompt it to install the SDK, build packages, and manage devices instead of running each command yourself. Full details are in the [Vega MCP server guide](https://developer.amazon.com/docs/vega/0.24/mcp-server.html).
 
-This is a required step - even if you'd rather install the SDK manually in the next section, you'll want ADBT available for later parts of the workshop.
-
 Install ADBT by initialising the context for your project:
 
 ```bash
@@ -55,8 +53,8 @@ ADBT will install the `vega` CLI, the Vega Virtual Device, React Native Kepler, 
 
 Follow the official guides:
 
-1. **[Install the Vega Developer Tools](https://developer.amazon.com/docs/vega/latest/install-vega-sdk.html)** - installs the `vega` CLI, the Vega Virtual Device, and React Native Kepler
-2. **[Configure Yarn for Vega](https://developer.amazon.com/docs/vega/latest/configure-package-managers.html)** - sets up Yarn to resolve Amazon device packages
+1. **[Install the Vega Developer Tools](https://developer.amazon.com/docs/vega/0.24/install-vega-sdk.html)** - installs the `vega` CLI, the Vega Virtual Device, and React Native Kepler
+2. **[Configure Yarn for Vega](https://developer.amazon.com/docs/vega/0.24/configure-package-managers.html)** - sets up Yarn to resolve Amazon device packages
 
 ## 0.4 Optional: Expo TV targets
 
