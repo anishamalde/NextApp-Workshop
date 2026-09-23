@@ -152,4 +152,4 @@ The layout and browse behaviour should remain shared, while the platform-specifi
 
 ---
 
-**Workshop complete:** You have built a shared multi-platform TV experience and measured its scrolling performance with ADBT.
+**Workshop complete:** You have built a shared multi-platform TV experience and measured its scrolling performance with ADBT or the manual Vega tools.

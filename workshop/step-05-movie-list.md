@@ -417,4 +417,4 @@ In [Step 6](./step-06-test-scrolling-performance-with-adbt.md), you'll measure h
 
 ---
 
-**Next:** [Step 6: Test scrolling performance with Amazon Devices Builder Tools →](./step-06-test-scrolling-performance-with-adbt.md)
+**Next:** [Step 6: Test scrolling performance on Vega →](./step-06-test-scrolling-performance-with-adbt.md)

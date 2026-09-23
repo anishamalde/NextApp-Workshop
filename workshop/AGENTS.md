@@ -71,7 +71,7 @@ The developer will ask questions along the way (about React Native, Vega, focus 
 
 ## Environment and tools
 
-- ADBT (Amazon Devices Builder Tools) may be available as an MCP server. If it is, prefer it for Vega SDK setup, builds, device management, and the UI-fluidity workflow in [Step 6](./step-06-test-scrolling-performance-with-adbt.md). Step 6 requires a physical Vega device; do not substitute the Vega Virtual Device for performance measurements.
+- ADBT (Amazon Devices Builder Tools) may be available as an MCP server. If it is, prefer it for Vega SDK setup, builds, device management, and the guided UI-fluidity workflow in [Step 6](./step-06-test-scrolling-performance-with-adbt.md). If it is unavailable, guide attendees through Step 6's manual Vega Studio or CLI path. Step 6 uses a physical Vega device for the workshop performance baseline.
 - All yarn scripts used in the workshop are listed in [`commands-and-troubleshooting.md`](./commands-and-troubleshooting.md).
 - The `final-app` branch contains the completed reference. Use it for verification, not for copying.
 
