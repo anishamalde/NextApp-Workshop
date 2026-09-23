@@ -11,16 +11,18 @@ You start with a working monorepo that already has a simple tile-based UI. The p
 - A shared `Header` component that shows a different logo per platform
 - A Lottie-powered animated logo with a web fallback
 - A shared API demo that fetches data from a public endpoint
+- A movie list rendered with `FlatList` on web/Android TV/Apple TV and the Vega `Carousel` on Fire TV
 - The same app running on multiple TV platforms and the web
 
 Along the way you'll learn:
 
-- How to set up the Vega SDK and run a React Native app on Fire TV
-- TV-specific patterns: focus management, D-pad navigation, 1080p scaling
+- How to set up the Vega SDK using ADBT (Amazon Devices Builder Tools) via MCP
+- Running builds from the Vega Studio IDE or the CLI
+- TV-specific patterns: D-pad navigation, focus guides (`TVFocusGuideView`), 1080p scaling
 - How a Yarn workspaces monorepo shares code across TV platforms
-- Two approaches to platform-specific code: file extensions (`.kepler.tsx`, `.web.tsx`) vs. `Platform.select()`
-- Adding native modules (Lottie animations) with platform-specific fallbacks
-- Sharing network logic and utilities across all platforms
+- Two approaches to platform-specific code: file extensions (`.kepler.tsx`, `.android.tsx`, `.ios.tsx`, `.web.tsx`) vs. `Platform.select()`
+- Adding Vega-wrapped native modules (Lottie, Carousel) and aliasing them via Metro's `extraNodeModules`
+- Sharing network logic and hooks across all platforms with a tiny `fetch` wrapper
 
 ## Workshop steps
 
@@ -45,9 +47,9 @@ This project uses [Yarn workspaces](https://yarnpkg.com/features/workspaces) to 
 ├── packages/
 │   ├── shared/                  # @multitv/shared
 │   │   ├── src/
-│   │   │   ├── components/      # Header, HeaderLogo, Tile, ApiDemo, IconReactNativeAnimated
+│   │   │   ├── components/      # Header, HeaderLogo, Tile, ApiDemo, IconReactNativeAnimated, MovieList, MoviePoster
 │   │   │   ├── screens/         # HomeScreen
-│   │   │   ├── data/            # Tile definitions
+│   │   │   ├── data/            # Tile definitions, movie catalog service + hook
 │   │   │   ├── services/        # HTTP client (fetch-based)
 │   │   │   ├── utils/           # Scaling utilities
 │   │   │   └── assets/          # Platform logos, background images
@@ -97,6 +99,9 @@ Common issues and fixes live in the workshop [Commands and troubleshooting](./wo
 - [React Native Documentation](https://reactnative.dev/)
 - [React Native TvOS](https://github.com/react-native-tvos/react-native-tvos)
 - [Vega Developer Portal](https://developer.amazon.com/docs/vega/vega.html)
+- [Vega MCP Server (ADBT)](https://developer.amazon.com/docs/vega/0.24/mcp-server.html)
+- [Vega Carousel](https://developer.amazon.com/docs/vega-api/0.24/vega-carousel.html)
+- [Vega Focus Management](https://developer.amazon.com/docs/vega/0.24/focus-management.html)
 - [Expo Documentation](https://docs.expo.dev/)
 - [Yarn Workspaces](https://yarnpkg.com/features/workspaces)
 
