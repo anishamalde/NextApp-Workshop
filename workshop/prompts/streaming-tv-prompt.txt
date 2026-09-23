@@ -1,6 +1,10 @@
 Work in the current React Native multi-TV monorepo. Preserve unrelated user
 changes and do not use another branch as a reference.
 
+Read the existing README, workshop instructions, and shared app code before
+editing. Follow the workshop's existing patterns, use the same simple language,
+and keep the result easy for an attendee to understand.
+
 Transform the existing workshop home screen into a simple streaming-style TV
 application inspired by Amazon's react-native-multi-tv-app-sample, without
 copying its full navigation architecture.

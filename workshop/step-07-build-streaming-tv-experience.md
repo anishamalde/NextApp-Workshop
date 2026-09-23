@@ -1,155 +1,99 @@
-# Step 7: Build a streaming TV experience with an AI prompt
+# Next steps: Build a streaming TV experience with an AI prompt
 
-In this capstone, you'll use an AI coding assistant to transform the workshop Hello World into a small streaming-style TV app. The result is inspired by the [React Native Multi-TV App Sample](https://github.com/AmazonAppDev/react-native-multi-tv-app-sample), while deliberately keeping the implementation small enough to understand during the workshop.
+You've built the shared app, added a movie list, and compared its scrolling performance. This optional next step shows how you can use a larger prompt to keep experimenting.
 
-Instead of copying the reference app's complete navigation architecture, you'll build one end-to-end experience:
+The prompt turns the Hello World screen into a small streaming-style TV experience with:
 
-```text
-Browse screen → Full-screen player → Browse screen
-```
+- A large featured movie
+- A horizontal row of movies
+- D-pad focus that updates the featured movie
+- Simple video playback
+- Shared code for Vega, Expo TV, and web
 
-The exercise brings together the workshop's main ideas: shared React Native code, platform-specific files, D-pad focus, 10-foot UI design, native dependencies, and cross-platform validation.
+The result is inspired by the [React Native Multi-TV App Sample](https://github.com/AmazonAppDev/react-native-multi-tv-app-sample), but keeps the app small enough to explore during the workshop.
 
-## 7.1 Explore the reference experience
+## Look at the example
 
-Open the [React Native Multi-TV App Sample](https://github.com/AmazonAppDev/react-native-multi-tv-app-sample) and look for these TV patterns:
+Open the sample app and look for:
 
-- A large hero area that gives the focused item context
-- Horizontal content browsing designed for a remote control
-- Strong, visible focus feedback
-- Selection that leads into full-screen video playback
-- Shared application code with platform-specific playback implementations
+- How the focused movie stands out
+- How focus changes the large image and title
+- How a movie opens in the video player
+- Which parts are shared between platforms
 
-Use the sample to understand the intended experience, not as code to copy. The workshop version uses only four static content items, one shelf, and a simple browse/player state machine.
+Use it for ideas rather than copying the whole app.
 
-## 7.2 Review the implementation prompt
+## Read the prompt
 
-The [`workshop/prompts`](./prompts/) directory contains [`streaming-tv-prompt.txt`](./prompts/streaming-tv-prompt.txt). Read it before giving it to your coding assistant:
+The prompt is in [`workshop/prompts/streaming-tv-prompt.txt`](./prompts/streaming-tv-prompt.txt):
 
 ```bash
 cat workshop/prompts/streaming-tv-prompt.txt
 ```
 
-The prompt acts as an implementation specification. It defines:
+It gives the coding assistant more detail than a normal workshop step because it describes the screen, focus behaviour, video playback, and checks to run.
 
-- The browse screen, hero, shelf, and content data
-- TV-safe spacing, typography, and focus behaviour
-- The shared video-player interface
-- Vega, Expo TV, and web playback implementations
-- Accessibility and test requirements
-- The commands and interactions that must be validated
+You do not need to memorise it. Treat it as a starting point that you can change.
 
-Notice the constraints as well as the requested features. The assistant should not add a remote catalog, a full navigation framework, adaptive HLS/DASH playback, captions, seeking, or media-session integration during this exercise.
+## Ask your coding assistant
 
-## 7.3 Give the prompt to your coding assistant
-
-Start your coding assistant from the repository root so it can resolve every path in the prompt. Ask it:
+Start your coding assistant from the repository root and ask:
 
 ```text
 Read workshop/prompts/streaming-tv-prompt.txt and implement it in this
 repository.
-Follow the validation section and report all changes, checks, build artifacts,
-and remaining warnings.
+
+Read the existing workshop files and code first. Keep the implementation simple
+and consistent with the patterns already used in the workshop.
 ```
 
-If your assistant cannot read repository files directly, copy and paste the contents of `workshop/prompts/streaming-tv-prompt.txt` into the conversation.
+Let the assistant inspect the project before it starts editing. It should reuse the shared package, scaling helpers, focus patterns, and platform-specific files you have already seen.
 
-The prompt instructs the assistant to preserve unrelated work and stay on the current branch. Let it inspect the existing code before it edits anything, because the new experience should reuse the monorepo, scaling utilities, and platform-resolution setup you used in the earlier steps.
+## Build and run
 
-## 7.4 Review the generated architecture
-
-Most of the feature should live in `packages/shared`. Review the assistant's changes and identify these responsibilities:
-
-```text
-packages/shared/src/
-├── components/
-│   ├── Hero.tsx
-│   ├── ContentCard.tsx
-│   └── player/
-│       ├── PlayerView.tsx
-│       ├── VideoPlayer.tsx
-│       ├── VideoPlayer.kepler.tsx
-│       └── VideoPlayer.web.tsx
-├── data/
-│   └── content.ts
-├── screens/
-│   └── HomeScreen.tsx
-└── theme/
-    └── safeZones.ts
-```
-
-Check that the implementation follows these boundaries:
-
-- `HomeScreen` owns the small browse/player state machine.
-- Shared browse components contain the common layout and focus behaviour.
-- `VideoPlayer.tsx` uses `react-native-video` for Expo TV targets.
-- `VideoPlayer.kepler.tsx` uses the Vega W3C `VideoPlayer` and `KeplerVideoSurfaceView` in URL mode with clear MP4 content, following the repository's Vega SDK 0.22 guidance.
-- `VideoPlayer.web.tsx` provides a simple browser fallback.
-- Platform-specific dependencies are added only to the workspace that needs them.
-- `packages/vega` contains the W3C media dependency, required Babel configuration, and media service declarations in `manifest.toml`.
-
-This is the same platform-resolution pattern you used for `HeaderLogo`, Lottie, and the movie list, now applied to a more substantial native feature.
-
-## 7.5 Validate the code
-
-The coding assistant should run the complete validation list from the prompt. You can also run the core checks yourself:
+Build and run on Vega. In Vega Studio, click the play button in the sidebar. Or use the command line:
 
 ```bash
-# Shared package tests and type checking
-yarn workspace @multitv/shared test --runInBand
-yarn workspace @multitv/shared tsc --noEmit
-
-# Vega tests, lint, type checking, and debug build
-WATCHMAN_DISABLE=1 yarn workspace @multitv/vega test --runInBand
-yarn workspace @multitv/vega lint
-yarn workspace @multitv/vega tsc --noEmit
 yarn vega:build
-
-# Expo TV lint and type checking
-yarn workspace @multitv/expotv lint
-yarn workspace @multitv/expotv tsc --noEmit
-
-# Check for whitespace errors
-git diff --check
-```
-
-If your environment cannot run one of these checks, make sure the assistant reports the exact command, error, and remaining manual action rather than treating the check as passed.
-
-## 7.6 Test the TV interaction
-
-Build and launch the app on the Vega Virtual Device:
-
-```bash
-vega virtual-device start
 yarn vega:vvd:mseries  # or yarn vega:vvd:intel
 ```
 
-Use the remote or keyboard to verify:
+Check that:
 
-1. The browse screen opens with the first Featured card focused.
-2. Moving right changes the hero image, title, and description immediately.
-3. The focused card scales up and has a visible orange focus treatment.
-4. Pressing Select opens the chosen video in the full-screen player.
-5. Play/Pause changes playback state.
-6. The controls hide after a short period and return after interaction.
-7. Exit or Back stops playback and returns to a usable position in the shelf.
+1. The first movie is focused.
+2. Pressing Right updates the large movie image and title.
+3. Pressing Select opens the video.
+4. Play/Pause works.
+5. Back or Exit returns to the movie row.
 
-Run the web target as a quick second-platform check:
+Run the web version as a quick second check:
 
 ```bash
 yarn expotv:web
 ```
 
-The layout and browse behaviour should remain shared, while the platform-specific player file changes automatically.
+## Change the prompt
+
+The prompt is meant to be edited. Try adding one more feature and ask your coding assistant to update the app.
+
+For example:
+
+- Add another movie row
+- Add a movie details screen
+- Add a Continue Watching row
+- Change the colours and card sizes
+- Add a search button
+- Add captions or playback progress
+
+Keep the first change small, build the app again, and check that D-pad focus still works.
 
 ## What you've learned
 
-- **Prompt as specification**: A useful coding prompt defines scope, architecture, interaction details, tests, and validation—not just the desired appearance.
-- **10-foot UI**: TV interfaces need readable typography, safe margins, clear hierarchy, and unmistakable focus feedback.
-- **Shared experience, native playback**: Browse logic can be shared while video playback uses the implementation appropriate to each platform.
-- **Focus-driven presentation**: Remote focus is application state that can update the hero before the user selects anything.
-- **Verification matters**: Generated code is not complete until its tests, builds, platform behaviour, and remaining warnings have been checked.
+- A prompt can describe a feature in enough detail for a coding assistant to implement it.
+- The same shared-code and platform-file patterns work for larger TV features.
+- You can change the prompt and use it to explore your own ideas.
+- Building and trying the result is still an important part of the workflow.
 
 ---
 
-**Workshop complete:** You have built a shared multi-platform TV experience and measured its scrolling performance with ADBT or the manual Vega tools.
+**Workshop complete:** You have built a shared multi-platform TV app, compared two list components, and created a starting point for further experiments.
