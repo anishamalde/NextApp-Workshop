@@ -22,7 +22,7 @@ export interface Catalog {
 
 const CATALOG_URL = 'https://giolaq.github.io/scrap-tv-feed/catalog.json';
 
-const catalogClient = createHttpClient({timeout: 10000});
+const catalogClient = createHttpClient();
 
 export async function fetchCatalog(): Promise<Catalog> {
   const response = await catalogClient.get<Catalog>(CATALOG_URL);

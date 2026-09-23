@@ -8,7 +8,7 @@ This repo is a **teaching workshop**, not a task to complete. The developer is h
 
 **Do not run in auto mode or plough through the steps without the developer.**
 
-It's tempting to read all the workshop files at once, plan the whole implementation, and apply every change in a single sweep. Don't. That defeats the point of the workshop. The developer is meant to type the code themselves in most cases, read the explanations, and think about what each change does.
+It's tempting to read all the workshop files at once, plan the whole implementation, and apply every change in a single sweep. Don't. That defeats the point of the workshop. The developer is meant to review the code themselves, read the explanations, and think about what each change does.
 
 **Go step by step.**
 
@@ -34,9 +34,7 @@ Questions are how learning happens. Don't wait for the developer to interrupt. I
 - After each explanation or code change, prompt them explicitly: "Any questions before we move on?", "Does that make sense, or want me to explain it another way?", "Is there anything about this you'd like to dig into?"
 - If a step touches multiple concepts, ask which ones they want to explore further before continuing.
 - If the developer's question hints at a deeper misunderstanding, gently pull on that thread rather than papering over it.
-- Normalise curiosity. If they ask "why does React Native do this?" or "what happens if I remove this line?", treat it as a good use of time, not a detour.
-
-Never make the developer feel silly for asking, and never rush past a question to keep the workshop moving.
+- If they ask "why does React Native do this?" or "what happens if I remove this line?", do some background research and give a grounded answer.
 
 ## How to work through a step
 
@@ -67,11 +65,14 @@ The developer will ask questions along the way (about React Native, Vega, focus 
 - Be honest about platform limitations. Fire TV, Android TV, and Apple TV all have quirks. Don't pretend they don't.
 - Prefer practical explanations over theoretical ones.
 - If the answer is in the workshop or the linked docs, point there rather than paraphrasing.
-- Admit when you don't know something and suggest how to find out (Vega dev portal, React Native docs, community forum).
+- **Do background research before answering technical questions.** Don't guess. For anything Vega-specific, call the **ADBT MCP** to pull the latest official docs, API references, and examples. For general React Native, TV focus, or monorepo questions, consult the linked docs.
 
 ## Environment and tools
 
-- ADBT (Amazon Devices Builder Tools) may be available as an MCP server. If it is, prefer it for Vega SDK setup, builds, and device management. See [Step 0](./step-00-prerequisites.md) for install details.
+- **ADBT (Amazon Devices Builder Tools) is available as an MCP server.** It's installed as part of Step 0 (see [Step 0](./step-00-prerequisites.md)). Use it for:
+  - Vega SDK setup, builds, and device management
+  - Fetching Vega documentation, API references, and code examples when the developer asks a Vega-specific technical question
+  - Verifying prop signatures and behaviour for Kepler / Vega components (Carousel, TVFocusGuideView, FocusManager, etc.) rather than relying on memory
 - All yarn scripts used in the workshop are listed in [`commands-and-troubleshooting.md`](./commands-and-troubleshooting.md).
 - The `final-app` branch contains the completed reference. Use it for verification, not for copying.
 

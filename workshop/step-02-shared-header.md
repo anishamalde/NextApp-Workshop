@@ -70,10 +70,13 @@ Notice `Platform.select()` at the top. This is approach #1: it returns a differe
 
 For the logo, each platform needs a different image. Rather than a big `if/else` chain, React Native's bundler (Metro) can resolve different files based on platform extensions.
 
-When you import `'./HeaderLogo'`, Metro looks for files in this order:
+When you import `'./HeaderLogo'`, Metro looks for a file matching the current platform:
+
 1. `HeaderLogo.kepler.tsx` (on Vega/Fire TV)
-2. `HeaderLogo.web.tsx` (on web)
-3. `HeaderLogo.tsx` (fallback)
+2. `HeaderLogo.android.tsx` (on Android TV)
+3. `HeaderLogo.ios.tsx` (on Apple TV)
+4. `HeaderLogo.web.tsx` (on web)
+5. `HeaderLogo.tsx` (fallback if none of the above match)
 
 Create these files in `packages/shared/src/components/Header/`:
 
@@ -97,47 +100,16 @@ export const HeaderLogo = ({style}: HeaderLogoProps) => {
 };
 ```
 
-**`HeaderLogo.kepler.tsx`** (Vega-specific, same as default here):
-```tsx
-import React from 'react';
-import {Image, ImageStyle} from 'react-native';
+Now create four platform-specific variants next to `HeaderLogo.tsx`. Each file is a copy of the default above with one change — a different `require` path (and web also tints the image white):
 
-export interface HeaderLogoProps {
-  style?: ImageStyle;
-}
+| File | Change vs. default |
+|---|---|
+| `HeaderLogo.kepler.tsx` | `require('../../assets/vega.png')` |
+| `HeaderLogo.android.tsx` | `require('../../assets/android.png')` |
+| `HeaderLogo.ios.tsx` | `require('../../assets/apple.png')` |
+| `HeaderLogo.web.tsx` | `require('../../assets/web.png')`, plus `style={[style, {tintColor: '#FFFFFF'}]}` |
 
-export const HeaderLogo = ({style}: HeaderLogoProps) => {
-  return (
-    <Image
-      source={require('../../assets/vega.png')}
-      style={style}
-      resizeMode="contain"
-    />
-  );
-};
-```
-
-**`HeaderLogo.web.tsx`**:
-```tsx
-import React from 'react';
-import {Image, ImageStyle} from 'react-native';
-
-export interface HeaderLogoProps {
-  style?: ImageStyle;
-}
-
-export const HeaderLogo = ({style}: HeaderLogoProps) => {
-  return (
-    <Image
-      source={require('../../assets/web.png')}
-      style={[style, {tintColor: '#FFFFFF'}]}
-      resizeMode="contain"
-    />
-  );
-};
-```
-
-The image assets (`vega.png`, `web.png`) already exist in `packages/shared/src/assets/`.
+The image assets (`vega.png`, `android.png`, `apple.png`, `web.png`) already exist in `packages/shared/src/assets/`.
 
 ## 2.3 Export the Header from the shared package
 
@@ -165,7 +137,8 @@ if (focusedTileId === 'home') {
 
 ## 2.5 Run and compare
 
-Build and run on Vega:
+Build and run on Vega. In Vega Studio, click the play button in the sidebar (see [Step 1](./step-01-setup-and-run.md#option-a-build-and-run-from-vega-studio-ide)). Or from the CLI:
+
 ```bash
 yarn vega:build
 yarn vega:vvd:mseries  # or yarn vega:vvd:intel
@@ -179,6 +152,8 @@ Now run on web:
 ```bash
 yarn expotv:web
 ```
+
+Or run on Android TV (`yarn expotv:android`) or Apple TV (`yarn expotv:ios`) if you have those emulators set up. See [Step 1: Run on another platform](./step-01-setup-and-run.md#13-run-on-another-platform).
 
 You should see "Hello Web," with the web logo. Same component, different presentation per platform.
 
