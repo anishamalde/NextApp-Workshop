@@ -234,7 +234,6 @@ import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import {
   Carousel,
   CarouselRenderInfo,
-  ItemInfo,
 } from '@amazon-devices/vega-carousel';
 import {useMovies, Movie} from '../../data/catalog';
 import {MoviePoster} from './MoviePoster';
@@ -244,20 +243,29 @@ export const MovieList = () => {
   const {movies, loading, error} = useMovies();
 
   const getItem = useCallback(
-    (index: number): ItemInfo<Movie> => ({item: movies[index], index}),
+    (index: number): Movie | undefined => {
+      if (index >= 0 && index < movies.length) {
+        return movies[index];
+      }
+      return undefined;
+    },
     [movies],
   );
+
   const getItemCount = useCallback(() => movies.length, [movies]);
-  const getItemKey = useCallback(
-    (index: number) => movies[index].id,
-    [movies],
+
+  const keyProviderHandler = useCallback(
+    (info: CarouselRenderInfo<Movie>) => `${info.index}-${info.item.id}`,
+    [],
   );
+
   const notifyDataError = useCallback((err: Error) => {
     console.warn('MovieList carousel data error:', err);
+    return false;
   }, []);
 
   const renderItem = useCallback(
-    ({item}: CarouselRenderInfo<Movie>) => <MoviePoster movie={item} />,
+    (info: CarouselRenderInfo<Movie>) => <MoviePoster movie={info.item} />,
     [],
   );
 
@@ -277,10 +285,19 @@ export const MovieList = () => {
     );
   }
 
+  if (movies.length === 0) {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
       <Carousel
-        dataAdapter={{getItem, getItemCount, getItemKey, notifyDataError}}
+        dataAdapter={{
+          getItem,
+          getItemCount,
+          getItemKey: keyProviderHandler,
+          notifyDataError,
+        }}
         renderItem={renderItem}
         testID="movie-carousel"
         uniqueId="movie-carousel"
@@ -314,6 +331,9 @@ const styles = StyleSheet.create({
 A few things worth noticing:
 
 - The `dataAdapter` gives the Carousel functions to look up items by index. It uses that to recycle views efficiently for very large catalogs.
+- **`getItem` must return `undefined` for out-of-bounds indices.** The Carousel probes indices beyond the current count during scroll, and returning `movies[index]` directly (which would be `undefined`) crashes native code that expects a valid item shape. Guard the bounds explicitly.
+- **`getItemKey` receives a `CarouselRenderInfo`, not a raw index.** That's the `keyProviderHandler` shape (`info.item`, `info.index`) — different from what a `FlatList` `keyExtractor` looks like.
+- We also short-circuit with `if (movies.length === 0) return null` so the Carousel is never mounted with an empty adapter.
 - `renderedItemsCount` is how many item views are kept alive at once. `numOffsetItems` is how many pre-rendered on either side of the focused item. Both are perf knobs.
 - `uniqueId` and `testID` are required for focus persistence and testing.
 

@@ -3,7 +3,6 @@ import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import {
   Carousel,
   CarouselRenderInfo,
-  ItemInfo,
 } from '@amazon-devices/vega-carousel';
 import {useMovies, Movie} from '../../data/catalog';
 import {MoviePoster} from './MoviePoster';
@@ -13,20 +12,29 @@ export const MovieList = () => {
   const {movies, loading, error} = useMovies();
 
   const getItem = useCallback(
-    (index: number): ItemInfo<Movie> => ({item: movies[index], index}),
+    (index: number): Movie | undefined => {
+      if (index >= 0 && index < movies.length) {
+        return movies[index];
+      }
+      return undefined;
+    },
     [movies],
   );
+
   const getItemCount = useCallback(() => movies.length, [movies]);
-  const getItemKey = useCallback(
-    (index: number) => movies[index].id,
-    [movies],
+
+  const keyProviderHandler = useCallback(
+    (info: CarouselRenderInfo<Movie>) => `${info.index}-${info.item.id}`,
+    [],
   );
+
   const notifyDataError = useCallback((err: Error) => {
     console.warn('MovieList carousel data error:', err);
+    return false;
   }, []);
 
   const renderItem = useCallback(
-    ({item}: CarouselRenderInfo<Movie>) => <MoviePoster movie={item} />,
+    (info: CarouselRenderInfo<Movie>) => <MoviePoster movie={info.item} />,
     [],
   );
 
@@ -46,10 +54,19 @@ export const MovieList = () => {
     );
   }
 
+  if (movies.length === 0) {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
       <Carousel
-        dataAdapter={{getItem, getItemCount, getItemKey, notifyDataError}}
+        dataAdapter={{
+          getItem,
+          getItemCount,
+          getItemKey: keyProviderHandler,
+          notifyDataError,
+        }}
         renderItem={renderItem}
         testID="movie-carousel"
         uniqueId="movie-carousel"
