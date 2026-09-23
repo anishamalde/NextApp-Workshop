@@ -230,11 +230,9 @@ For Vega, swap `FlatList` for the Amazon Devices Carousel. It has a slightly dif
 
 ```tsx
 import React, {useCallback} from 'react';
-import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
-import {
-  Carousel,
-  CarouselRenderInfo,
-} from '@amazon-devices/vega-carousel';
+import {Text, ActivityIndicator, StyleSheet} from 'react-native';
+import {Carousel, CarouselRenderInfo} from '@amazon-devices/vega-carousel';
+import {TVFocusGuideView} from '@amazon-devices/react-native-kepler';
 import {useMovies, Movie} from '../../data/catalog';
 import {MoviePoster} from './MoviePoster';
 import {scaleFontSize, scaleWidth, scaleHeight} from '../../utils/scaling';
@@ -243,70 +241,37 @@ export const MovieList = () => {
   const {movies, loading, error} = useMovies();
 
   const getItem = useCallback(
-    (index: number): Movie | undefined => {
-      if (index >= 0 && index < movies.length) {
-        return movies[index];
-      }
-      return undefined;
-    },
+    (index: number) =>
+      index >= 0 && index < movies.length ? movies[index] : undefined,
     [movies],
   );
-
   const getItemCount = useCallback(() => movies.length, [movies]);
-
-  const keyProviderHandler = useCallback(
-    (info: CarouselRenderInfo<Movie>) => `${info.index}-${info.item.id}`,
-    [],
-  );
-
-  const notifyDataError = useCallback((err: Error) => {
-    console.warn('MovieList carousel data error:', err);
-    return false;
-  }, []);
-
-  const renderItem = useCallback(
-    (info: CarouselRenderInfo<Movie>) => <MoviePoster movie={info.item} />,
-    [],
+  const getItemKey = (info: CarouselRenderInfo<Movie>) => info.item.id;
+  const notifyDataError = () => false;
+  const renderItem = (info: CarouselRenderInfo<Movie>) => (
+    <MoviePoster movie={info.item} />
   );
 
   if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#FFFFFF" />
-      </View>
+      <ActivityIndicator size="large" color="#FFFFFF" style={styles.centered} />
     );
   }
-
   if (error) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.error}>{error}</Text>
-      </View>
-    );
+    return <Text style={styles.error}>{error}</Text>;
   }
-
   if (movies.length === 0) {
     return null;
   }
 
   return (
-    <View style={styles.container}>
+    <TVFocusGuideView autoFocus={true} style={styles.container}>
       <Carousel
-        dataAdapter={{
-          getItem,
-          getItemCount,
-          getItemKey: keyProviderHandler,
-          notifyDataError,
-        }}
+        dataAdapter={{getItem, getItemCount, getItemKey, notifyDataError}}
         renderItem={renderItem}
-        testID="movie-carousel"
         uniqueId="movie-carousel"
-        orientation="horizontal"
-        renderedItemsCount={8}
-        numOffsetItems={2}
-        initialStartIndex={0}
       />
-    </View>
+    </TVFocusGuideView>
   );
 };
 
@@ -316,15 +281,8 @@ const styles = StyleSheet.create({
     height: scaleHeight(400),
     paddingHorizontal: scaleWidth(20),
   },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  error: {
-    color: '#FFFFFF',
-    fontSize: scaleFontSize(40),
-  },
+  centered: {flex: 1},
+  error: {color: '#FFFFFF', fontSize: scaleFontSize(40)},
 });
 ```
 
@@ -332,12 +290,12 @@ A few things worth noticing:
 
 - The `dataAdapter` gives the Carousel functions to look up items by index. It uses that to recycle views efficiently for very large catalogs.
 - **`getItem` must return `undefined` for out-of-bounds indices.** The Carousel probes indices beyond the current count during scroll, and returning `movies[index]` directly (which would be `undefined`) crashes native code that expects a valid item shape. Guard the bounds explicitly.
-- **`getItemKey` receives a `CarouselRenderInfo`, not a raw index.** That's the `keyProviderHandler` shape (`info.item`, `info.index`) — different from what a `FlatList` `keyExtractor` looks like.
-- We also short-circuit with `if (movies.length === 0) return null` so the Carousel is never mounted with an empty adapter.
-- `renderedItemsCount` is how many item views are kept alive at once. `numOffsetItems` is how many pre-rendered on either side of the focused item. Both are perf knobs.
-- `uniqueId` and `testID` are required for focus persistence and testing.
+- **`getItemKey` receives a `CarouselRenderInfo`, not a raw index.** It's `(info) => key`, where `info.item` and `info.index` are available — different from a `FlatList` `keyExtractor`.
+- We short-circuit with `if (movies.length === 0) return null` so the Carousel is never mounted with an empty adapter.
+- `TVFocusGuideView` with `autoFocus` wraps the Carousel so pressing **Up** from the Movies tile hands focus into the carousel row. Without it, focus would just stay on the tile row.
+- We're relying on defaults for `orientation`, `renderedItemsCount`, `numOffsetItems`, and `initialStartIndex`. All of those are perf knobs you can tune later (see the docs) — the defaults are fine for a 25-item catalog.
 
-For the full prop reference, see the [Vega Carousel docs](https://developer.amazon.com/docs/vega/latest/vega-carousel.html).
+For the full prop reference, see the [Vega Carousel docs](https://developer.amazon.com/docs/vega/latest/vega-carousel.html) and [Focus Management on Vega](https://developer.amazon.com/docs/vega/latest/focus-management.html).
 
 ## 5.5 Add the Vega Carousel dependency
 
@@ -393,6 +351,30 @@ Metro picks the right file automatically:
 - `MovieList.tsx` on Expo TV and web
 
 Same import path, different implementations, no `Platform.select()` needed.
+
+### Stop resetting focus on tile blur
+
+The starter `HomeScreen` resets the focused-content area back to `'home'` whenever any tile blurs:
+
+```tsx
+const handleTileBlur = useCallback(() => {
+  setFocusedTileId('home');
+}, []);
+```
+
+That was fine when tiles only ever showed a description. It's a problem now: pressing **Up** from the Movies tile blurs it, which unmounts the MovieList before focus can travel into the carousel. Focus falls back to the home tile instead.
+
+Change the blur handler to a no-op so the last-focused content stays mounted while focus moves up into it:
+
+```tsx
+const handleTileBlur = useCallback(() => {
+  // No-op: keep the focused-content area showing the last-focused tile's
+  // content so users can move focus up into it (e.g. into the Movies
+  // carousel) without unmounting it.
+}, []);
+```
+
+Now the flow works: focus Movies → carousel appears → press Up → `TVFocusGuideView` hands focus to the carousel → press Down → focus returns to the tile row.
 
 ## 5.8 Export the new pieces
 
