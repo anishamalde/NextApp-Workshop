@@ -19,7 +19,9 @@ export const HomeScreen = () => {
   }, []);
 
   const handleTileBlur = useCallback(() => {
-    setFocusedTileId('home');
+    // No-op: keep the focused-content area showing the last-focused tile's
+    // content so users can move focus up into it (e.g. into the Movies
+    // carousel) without unmounting it.
   }, []);
 
   const renderFocusedContent = () => {
