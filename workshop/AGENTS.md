@@ -56,7 +56,7 @@ Never make the developer feel silly for asking, and never rush past a question t
 - Don't refactor code the workshop hasn't asked you to touch.
 - Don't add "improvements" (better types, extra abstractions, comments) unless the developer asks.
 - Don't skip the explanatory prose in the workshop files. It's there on purpose.
-- Don't run all four steps in one go, even if the developer asks. Push back and explain why the workshop is designed to be paced.
+- Don't run all workshop steps in one go, even if the developer asks. Push back and explain why the workshop is designed to be paced.
 - Don't complete the workshop by copying from the `final-app` branch. That branch is for comparing progress, not for shortcuts.
 - Don't shut down curiosity to stay on script. If a question opens a useful tangent, follow it.
 
@@ -71,7 +71,7 @@ The developer will ask questions along the way (about React Native, Vega, focus 
 
 ## Environment and tools
 
-- ADBT (Amazon Devices Builder Tools) may be available as an MCP server. If it is, prefer it for Vega SDK setup, builds, and device management. See [Step 0](./step-00-prerequisites.md) for install details.
+- ADBT (Amazon Devices Builder Tools) may be available as an MCP server. If it is, prefer it for Vega SDK setup, builds, device management, and the UI-fluidity workflow in [Step 6](./step-06-test-scrolling-performance-with-adbt.md). Step 6 requires a physical Vega device; do not substitute the Vega Virtual Device for performance measurements.
 - All yarn scripts used in the workshop are listed in [`commands-and-troubleshooting.md`](./commands-and-troubleshooting.md).
 - The `final-app` branch contains the completed reference. Use it for verification, not for copying.
 

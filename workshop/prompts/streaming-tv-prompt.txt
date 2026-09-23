@@ -1,0 +1,136 @@
+Work in the current React Native multi-TV monorepo. Preserve unrelated user
+changes and do not use another branch as a reference.
+
+Transform the existing workshop home screen into a simple streaming-style TV
+application inspired by Amazon's react-native-multi-tv-app-sample, without
+copying its full navigation architecture.
+
+Objective
+
+Create a small end-to-end TV experience consisting of:
+
+1. A 10-foot browse screen.
+2. One horizontal content shelf.
+3. A hero area updated by focus.
+4. A basic cross-platform video player.
+
+Keep the implementation simple and primarily inside packages/shared.
+
+Browse screen
+
+- Replace the workshop tile layout with a streaming-style home screen.
+- Add a static content data file containing four items.
+- Each item must contain:
+  - id
+  - title
+  - description
+  - poster image URL
+  - hero image URL
+  - video URL
+- Use stable HTTPS sample media.
+- Do not fetch a remote catalog.
+
+- Display a large hero image across the upper portion of the screen.
+- Add a dark gradient or readable scrim over the hero.
+- Show the focused item's title and a description limited to three lines.
+- Add one horizontal row titled “Featured”.
+- Render four landscape content cards.
+- Focusing a card must immediately update the hero content.
+- Selecting a card must open its video.
+
+10-foot UI
+
+- Continue using the existing 1920x1080 scaling utilities.
+- Add reusable title-safe and action-safe spacing constants.
+- Keep text readable from a TV viewing distance:
+  - Hero title approximately 56–64 design pixels.
+  - Description approximately 26–30 design pixels.
+  - Shelf title approximately 36–40 design pixels.
+- Keep important content at least 5% away from screen edges.
+- Avoid small labels, crowded layouts, or mobile-style controls.
+
+TV focus
+
+- Preserve D-pad navigation and preferred focus on the first card.
+- Use the existing React Native focus events; do not add a spatial-navigation
+  dependency for a single row.
+- Focused cards must:
+  - Scale to approximately 1.08.
+  - Show a visible orange border or glow.
+  - Remain unclipped.
+- Add accessibilityRole, accessibilityLabel, and stable testID values.
+- Remember the selected card when returning from playback where practical.
+
+Video player
+
+- Selecting a card opens a full-screen player without introducing a complete
+  navigation framework. A small browse/player state machine in HomeScreen is
+  sufficient.
+- Use a black full-screen background.
+- Autoplay the selected video.
+- Show loading and clear playback-error states.
+- Add a controls overlay containing:
+  - Play/Pause
+  - Exit
+- Show controls when playback starts or the user interacts.
+- Automatically hide controls after five seconds.
+- Back must stop playback and return to the browse screen.
+- Clean up timers, listeners, surfaces, and player instances on unmount.
+
+Platform implementation
+
+- Create a shared player interface.
+- Use react-native-video for Expo TV targets.
+- Create a .kepler.tsx player implementation for Vega using
+  @amazon-devices/react-native-w3cmedia and KeplerVideoSurfaceView.
+- Add only dependencies genuinely required by each workspace.
+- Verify compatible versions against the React Native version used by each
+  workspace rather than copying versions blindly.
+- Provide a simple web fallback if native playback is unavailable.
+- Do not implement captions, seeking, media sessions, or hardware media-key
+  integration in this iteration.
+
+Suggested structure
+
+- packages/shared/src/data/content.ts
+- packages/shared/src/components/Hero.tsx
+- packages/shared/src/components/ContentCard.tsx
+- packages/shared/src/components/player/VideoPlayer.tsx
+- packages/shared/src/components/player/VideoPlayer.kepler.tsx
+- packages/shared/src/components/player/VideoPlayer.web.tsx
+- packages/shared/src/components/player/PlayerView.tsx
+- packages/shared/src/screens/HomeScreen.tsx
+- packages/shared/src/theme/safeZones.ts
+
+Testing
+
+Add meaningful tests verifying:
+
+- The hero and four Featured cards render.
+- The first card has preferred TV focus.
+- Focusing another card updates the hero title and description.
+- Selecting a card opens the player.
+- Play/Pause changes state.
+- Exit returns to the browse screen.
+- Loading and error states render.
+- Platform video modules are represented by lightweight Jest mocks.
+
+Validation
+
+- Install dependencies using the Yarn version pinned by the repository.
+- Do not modify yarn.lock unless dependencies genuinely change.
+- Run the shared TypeScript check and tests.
+- Run Vega tests with Watchman disabled.
+- Run Vega lint.
+- Run Expo TV lint and TypeScript validation.
+- Run git diff --check.
+- Build the Vega debug packages.
+- Launch the Vega build and validate it with VegaProbe:
+  - Home loads with the first card focused.
+  - Moving right updates the hero.
+  - Selecting a card opens the player.
+  - Play/Pause and Exit are usable.
+  - Returning restores a usable focus position.
+
+Report all changed files, dependencies added, checks passed, Vega build
+artifacts, VegaProbe evidence, and remaining warnings.
