@@ -7,7 +7,7 @@ In this step, you'll compare the two movie list components you added in [Step 5]
 
 You'll run the same UI Fluidity test for both components on a physical Vega device, then compare the results.
 
-This also builds on the platform file extension pattern from [Step 2](./step-02-shared-header.md). You'll temporarily hide `MovieList.kepler.tsx` so Vega uses the shared `MovieList.tsx` file instead. You won't create another list component or delete either implementation.
+This also builds on the platform file extension pattern from [Step 2](./step-02-shared-header.md). You'll temporarily hide `MovieList.kepler.tsx` so Vega uses the shared `MovieList.tsx` file instead.
 
 ## 6.1 Understand what you'll measure
 
