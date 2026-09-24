@@ -32,6 +32,8 @@ Browse screen
   - hero image URL
   - video URL
 - Use stable HTTPS clear-content MP4 URLs for the videos.
+- Check that each chosen video URL is reachable before using it. Replace URLs
+  that return 403, require authentication, or only work from selected origins.
 - Do not use HLS, DASH, DRM-protected, or live streams in this iteration. Those
   require MSE mode and a JavaScript player such as Shaka Player, hls.js, or
   dash.js on Vega.
@@ -81,6 +83,9 @@ Video player
   - Exit
 - Show controls when playback starts or the user interacts.
 - Automatically hide controls after five seconds.
+- Do not unmount the focused control when the overlay hides. Keep the controls
+  mounted or deliberately restore focus so the next D-pad or Select action can
+  reveal and operate them.
 - Back must stop playback and return to the browse screen.
 - Clean up timers, listeners, surfaces, and player instances on unmount.
 
@@ -119,7 +124,20 @@ Vega media configuration
   - com.amazon.audio.control
   - com.amazon.media.server
   - com.amazon.media.playersession.service
+- Add the W3C Media modules required by the player under [[needs.module]]:
+  - /com.amazon.kepler.kepler_media_controls_1@IKeplerMediaControls_0
+  - /com.amazon.kepler.keplermediadescriptor_1@IKeplermediadescriptor_1
+  - /com.amazon.kepler.w3cmedia_2@IW3cmedia_1
 - Preserve the existing manifest package, component, and needs declarations.
+
+Expo web configuration
+
+- Expo Metro reads tsconfig path mappings by default. Do not map the runtime
+  modules react or react/jsx-runtime directly to @types/react.
+- If workspace-specific React type mappings are required, keep those mappings
+  out of Metro resolution and preserve the existing @/* source alias.
+- Confirm that the web bundle completes rather than relying only on a
+  TypeScript check.
 
 Suggested structure
 
@@ -157,7 +175,9 @@ Validation
 - Run git diff --check.
 - Build the Vega debug packages.
 - Launch the Vega build on the Vega Virtual Device or a connected physical Vega
-  device. Validate the interaction manually or with Appium:
+  device. Manual validation with the simulator remote is sufficient; Appium is
+  optional and the Kepler performance API is not required for this step.
+  Validate:
   - Home loads with the first card focused.
   - Moving right updates the hero.
   - Selecting a card opens the player.
