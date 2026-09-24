@@ -176,4 +176,4 @@ If you want to investigate a failing result after the workshop, Amazon's [Invest
 
 ---
 
-**Next:** [Next steps: Build a streaming TV experience with an AI prompt →](./step-07-build-streaming-tv-experience.md)
+**Next:** [Next steps: Build a streaming TV experience with an AI prompt →](./step-07-next-steps.md)

@@ -39,7 +39,7 @@ Along the way you'll learn:
 | [Step 4: Add an API demo](./workshop/step-04-add-api-demo.md)         | Fetch data from a public API in a shared component         | Network requests, shared utilities, fetch across platforms |
 | [Step 5: Movie list](./workshop/step-05-movie-list.md)                | Replace Test & Debug with a movie list, FlatList vs Carousel | Reusing the shared httpClient, TV list performance, platform-specific list components |
 | [Step 6: Compare scrolling performance on Vega](./workshop/step-06-test-scrolling-performance-with-adbt.md) | Measure `FlatList` and the Vega Carousel on a physical device | UI Fluidity and fair performance comparisons |
-| [Next steps: Build a streaming TV experience](./workshop/step-07-build-streaming-tv-experience.md) | Try and edit `workshop/prompts/streaming-tv-prompt.txt` with an AI coding assistant | Extending the app with an AI prompt |
+| [Next steps: Build a streaming TV experience](./workshop/step-07-next-steps.md) | Try and edit `workshop/prompts/streaming-tv-prompt.txt` with an AI coding assistant | Extending the app with an AI prompt |
 
 The `final-app` branch contains the completed version with all steps applied. Compare your progress at any point by checking out `final-app`.
 
