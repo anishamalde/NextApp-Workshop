@@ -61,19 +61,50 @@ const styles = StyleSheet.create({
 });
 ```
 
-**`IconReactNativeAnimated.web.tsx`** (empty web fallback):
+**`IconReactNativeAnimated.web.tsx`** (web fallback using React Native's Animated API):
 
 ```tsx
-import React from 'react';
+import React, {useRef, useEffect} from 'react';
+import {Animated, StyleSheet, Easing} from 'react-native';
+import {scaleWidth, scaleHeight} from '../../utils/scaling';
 
-// Web fallback - Lottie's native renderer isn't available on web,
-// so we render nothing here.
 export const IconReactNativeAnimated = () => {
-  return <></>;
+  const spinValue = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(spinValue, {
+        toValue: 1,
+        duration: 3000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    ).start();
+  }, [spinValue]);
+
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  return (
+    <Animated.Image
+      source={require('../../assets/react-logo.png')}
+      style={[styles.logo, {transform: [{rotate: spin}]}]}
+    />
+  );
 };
+
+const styles = StyleSheet.create({
+  logo: {
+    width: scaleWidth(300),
+    height: scaleHeight(300),
+    resizeMode: 'contain',
+  },
+});
 ```
 
-Lottie relies on a native renderer that doesn't exist on web, so the web variant is deliberately empty — the "Animated Demo" tile still focuses and the description text still shows, but nothing spins. Same component name, same import path, completely different implementation. If you wanted a real web animation, you could swap in a CSS keyframe, a WebP loop, or React Native's `Animated` API; the important point is that the shared code doesn't need to know or care.
+Lottie's native renderer isn't available on web, so instead of shipping nothing we use React Native's built-in `Animated` API to spin a static React Native logo. Same component name, same import path, completely different implementation — the shared code that renders `<IconReactNativeAnimated />` doesn't need to know which variant it's getting. The `react-logo.png` asset already lives in `packages/shared/src/assets/`.
 
 ## 3.3 Replace the Get Started tile
 
@@ -149,7 +180,7 @@ yarn expotv:web
 
 Or run on Android TV (`yarn expotv:android`) or Apple TV (`yarn expotv:ios`) if you have those emulators set up. See [Step 1: Run on another platform](./step-01-setup-and-run.md#13-run-on-another-platform).
 
-Navigate to the "Animated Demo" tile. On Vega you'll see the Lottie animation spinning. On web there's no animation — the tile is still selectable, the description still shows, but `IconReactNativeAnimated` renders nothing. Same component name, same import **path**, completely different implementation. HomeScreen imports `IconReactNativeAnimated` once; Metro picks the `.web.tsx` or `.kepler.tsx` file behind the scenes.
+Navigate to the "Animated Demo" tile. You should see a spinning React Native logo. On Vega it's a Lottie animation, on web it's React Native's `Animated` API rotating a static image. Same component name, same import **path**, completely different implementation. HomeScreen imports `IconReactNativeAnimated` once; Metro picks the `.web.tsx` or `.kepler.tsx` file behind the scenes.
 
 ![Animated demo running on web](./images/step-03-animation-web.gif)
 
