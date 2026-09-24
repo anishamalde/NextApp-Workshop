@@ -1,6 +1,8 @@
 # Next steps: Build a streaming TV experience with an AI prompt
 
-You've built the shared app, added a movie list, and compared its scrolling performance. This optional next step shows how you can use a larger prompt to keep experimenting.
+In this optional next step, you'll use an AI coding assistant to turn the workshop app into a small streaming-style TV experience.
+
+This builds on the same shared components, platform-specific files, and D-pad focus patterns you used in the earlier steps. The difference is that you'll give the coding assistant a larger prompt, then change that prompt to try your own ideas.
 
 The prompt turns the Hello World screen into a small streaming-style TV experience with:
 
@@ -12,7 +14,7 @@ The prompt turns the Hello World screen into a small streaming-style TV experien
 
 The result is inspired by the [React Native Multi-TV App Sample](https://github.com/AmazonAppDev/react-native-multi-tv-app-sample), but keeps the app small enough to explore during the workshop.
 
-## Look at the example
+## Explore the example
 
 Open the sample app and look for:
 
@@ -23,7 +25,7 @@ Open the sample app and look for:
 
 Use it for ideas rather than copying the whole app.
 
-## Read the prompt
+## Review the prompt
 
 The prompt is in [`workshop/prompts/streaming-tv-prompt.txt`](./prompts/streaming-tv-prompt.txt):
 
@@ -35,7 +37,7 @@ It gives the coding assistant more detail than a normal workshop step because it
 
 You do not need to memorise it. Treat it as a starting point that you can change.
 
-## Ask your coding assistant
+## Give the prompt to your coding assistant
 
 Start your coding assistant from the repository root and ask:
 
@@ -49,16 +51,16 @@ and consistent with the patterns already used in the workshop.
 
 Let the assistant inspect the project before it starts editing. It should reuse the shared package, scaling helpers, focus patterns, and platform-specific files you have already seen.
 
-## Build and run
+## Run and verify
 
-Build and run on Vega. In Vega Studio, click the play button in the sidebar. Or use the command line:
+Build and run on Vega. In Vega Studio, click the play button in the sidebar (see [Step 1](./step-01-setup-and-run.md#option-a-build-and-run-from-vega-studio-ide)). Or from the CLI:
 
 ```bash
 yarn vega:build
 yarn vega:vvd:mseries  # or yarn vega:vvd:intel
 ```
 
-Check that:
+Use the D-pad to move through the movie row and check that:
 
 1. The first movie is focused.
 2. Pressing Right updates the large movie image and title.
@@ -66,13 +68,13 @@ Check that:
 4. Play/Pause works.
 5. Back or Exit returns to the movie row.
 
-Run the web version as a quick second check:
+Now run on web:
 
 ```bash
 yarn expotv:web
 ```
 
-## Change the prompt
+## Try another feature
 
 The prompt is meant to be edited. Try adding one more feature and ask your coding assistant to update the app.
 
@@ -89,10 +91,10 @@ Keep the first change small, build the app again, and check that D-pad focus sti
 
 ## What you've learned
 
-- A prompt can describe a feature in enough detail for a coding assistant to implement it.
-- The same shared-code and platform-file patterns work for larger TV features.
-- You can change the prompt and use it to explore your own ideas.
-- Building and trying the result is still an important part of the workflow.
+- **Prompt as a starting point**: A detailed prompt can give a coding assistant enough context to build a feature.
+- **Reusing workshop patterns**: The same shared components and platform-specific files work for a larger TV experience.
+- **Experimenting safely**: You can start with a small change to the prompt, rebuild, and check the result.
+- **Run and verify**: Generated code still needs to be built and tested on each platform.
 
 ---
 

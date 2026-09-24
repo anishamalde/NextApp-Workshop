@@ -1,15 +1,15 @@
 # Step 6: Compare scrolling performance on Vega
 
-Step 5 added two ways to show the movie list:
+In this step, you'll compare the two movie list components you added in [Step 5](./step-05-movie-list.md):
 
 - React Native `FlatList`
 - The Vega Carousel
 
-In this step, you'll measure both on the same physical Vega device. The goal is simple: learn how to run the UI Fluidity test and see whether changing the list component changes the result.
+You'll run the same UI Fluidity test for both components on a physical Vega device, then compare the results.
 
-Use the same device, Release build, and scrolling test for both measurements. That makes the comparison meaningful.
+This also builds on the platform file extension pattern from [Step 2](./step-02-shared-header.md). You'll temporarily hide `MovieList.kepler.tsx` so Vega uses the shared `MovieList.tsx` file instead. You won't create another list component or delete either implementation.
 
-## 6.1 Understand the result
+## 6.1 Understand what you'll measure
 
 UI Fluidity measures how smoothly the app renders while focus moves through the list.
 
@@ -23,15 +23,17 @@ KPI Visualizer runs three iterations and displays a P90 score. Record that score
 
 The default test sends horizontal and vertical D-pad actions. Watch the device and confirm that the horizontal actions move through the movie list. If they do not, do not use that result for the comparison.
 
-## 6.2 Prepare the device
+## 6.2 Prepare the Vega device
 
-Use a physical Vega device for both measurements.
+Use the same physical Vega device, Release build, and scrolling test for both measurements. This makes the comparison meaningful.
 
-From the repository root, check that the device is connected:
+Run the commands in this step from the repository root. Check that your device is connected:
 
 ```bash
 vega exec vda devices
 ```
+
+If the list is empty, connect a physical Vega device before continuing. See [Step 1: Run on a Fire TV Stick](./step-01-setup-and-run.md#run-on-a-fire-tv-stick) if you need to configure the device.
 
 UI Fluidity testing requires Appium `2.2.2` and the Vega `kepler` Appium driver `3.30.0`. KPI Visualizer also lists `@amazon-devices/kepler-performance-api` as a prerequisite.
 
@@ -46,9 +48,9 @@ Resolve any errors before continuing.
 
 ## 6.3 Choose how to run the measurement
 
-Use either path for both components.
+You can run the measurement with Amazon Devices Builder Tools (ADBT), or directly with Vega Studio or the CLI. Use the same option for both components.
 
-### Path A: Use ADBT
+### Option A: Use ADBT
 
 Give your AI coding assistant this prompt:
 
@@ -65,7 +67,7 @@ through the movie list.
 
 ADBT will check the device, app, Appium, and driver before running KPI Visualizer.
 
-### Path B: Run it manually
+### Option B: Use Vega Studio or the CLI
 
 In Vega Studio:
 
@@ -97,7 +99,7 @@ These steps follow Amazon's [Measure App KPIs](https://developer.amazon.com/docs
 
 ## 6.4 Measure FlatList
 
-Vega automatically selects `MovieList.kepler.tsx`, which uses the Carousel. This is the same platform file resolution you used for the Header.
+Vega automatically selects `MovieList.kepler.tsx`, which uses the Carousel. This is the same platform file resolution you used for the Header in Step 2.
 
 To switch to `FlatList`, hide the Vega-specific file by temporarily renaming it. Do not delete it. With the `.kepler.tsx` file hidden, Vega falls back to the shared `MovieList.tsx` implementation:
 
@@ -107,14 +109,14 @@ mv \
   packages/shared/src/components/MovieList/MovieList.kepler.tsx.hidden
 ```
 
-Build and install the Release app:
+Build and install the Release app on your physical device:
 
 ```bash
 yarn workspace @multitv/vega build:release
 vega device install-app --dir packages/vega -b Release
 ```
 
-Run the measurement using Path A or Path B, then record the P90 score:
+Run the measurement using Option A or Option B, then record the P90 score:
 
 | Component | P90 Fluidity |
 | --------- | ------------- |
@@ -130,14 +132,14 @@ mv \
   packages/shared/src/components/MovieList/MovieList.kepler.tsx
 ```
 
-Build and install the Release app again:
+Build and install the Release app on the same device:
 
 ```bash
 yarn workspace @multitv/vega build:release
 vega device install-app --dir packages/vega -b Release
 ```
 
-Run the same measurement again:
+Run the same measurement again and record the P90 score:
 
 | Component | P90 Fluidity |
 | --------- | ------------- |
