@@ -11,9 +11,11 @@ You'll need the following on your machine:
 - **[Git](https://git-scm.com/)**
 - **macOS 10.15+ or Ubuntu 20.04+** (required for the Vega SDK)
 
-## 0.2 Install ADBT (Amazon Developer Build Tools)
+## 0.2 Install ADBT (Amazon Developer Build Tools, recommended)
 
 ADBT is the agentic tooling for Vega development. It exposes an MCP server that your AI assistant (Claude, Cursor, etc.) can talk to, so you can prompt it to install the SDK, build packages, and manage devices instead of running each command yourself. Full details are in the [Vega MCP server guide](https://developer.amazon.com/docs/vega/0.24/mcp-server.html).
+
+ADBT is recommended because it provides the guided path used throughout the workshop. If you cannot install it, Step 6 also includes a manual Vega Studio and CLI path for measuring UI fluidity.
 
 Install ADBT by initialising the context for your project:
 

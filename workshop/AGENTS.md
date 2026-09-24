@@ -54,7 +54,7 @@ Questions are how learning happens. Don't wait for the developer to interrupt. I
 - Don't refactor code the workshop hasn't asked you to touch.
 - Don't add "improvements" (better types, extra abstractions, comments) unless the developer asks.
 - Don't skip the explanatory prose in the workshop files. It's there on purpose.
-- Don't run all four steps in one go, even if the developer asks. Push back and explain why the workshop is designed to be paced.
+- Don't run all workshop steps in one go, even if the developer asks. Push back and explain why the workshop is designed to be paced.
 - Don't complete the workshop by copying from the `final-app` branch. That branch is for comparing progress, not for shortcuts.
 - Don't shut down curiosity to stay on script. If a question opens a useful tangent, follow it.
 
@@ -69,10 +69,12 @@ The developer will ask questions along the way (about React Native, Vega, focus 
 
 ## Environment and tools
 
-- **ADBT (Amazon Devices Builder Tools) is available as an MCP server.** It's installed as part of Step 0 (see [Step 0](./step-00-prerequisites.md)). Use it for:
+- **ADBT (Amazon Devices Builder Tools) is the recommended MCP server.** When it is installed in [Step 0](./step-00-prerequisites.md), use it for:
   - Vega SDK setup, builds, and device management
   - Fetching Vega documentation, API references, and code examples when the developer asks a Vega-specific technical question
   - Verifying prop signatures and behaviour for Kepler / Vega components (Carousel, TVFocusGuideView, FocusManager, etc.) rather than relying on memory
+  - The guided UI-fluidity comparison in [Step 6](./step-06-test-scrolling-performance-with-adbt.md)
+- If ADBT is unavailable, guide attendees through Step 6's manual Vega Studio or CLI path. Step 6 compares `FlatList` and the Vega Carousel on the same physical device. Keep the workshop exercise focused on measuring and comparing the P90 scores; only introduce CPU profiling or Perfetto if the developer asks to investigate further.
 - All yarn scripts used in the workshop are listed in [`commands-and-troubleshooting.md`](./commands-and-troubleshooting.md).
 - The `final-app` branch contains the completed reference. Use it for verification, not for copying.
 
