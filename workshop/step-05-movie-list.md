@@ -415,10 +415,10 @@ Same fetch, same posters, but rendered by `FlatList`. Scroll with the arrow keys
 - **Reusing shared services**: Step 4's httpClient handled the network call for a different endpoint with no changes.
 - **A shared hook, two views**: `useMovies` centralises the loading/error/data flow. Each list component just decides how to render.
 - **Platform file extensions for list components**: same import, different implementation per platform, no `Platform.select()`.
-- **`FlatList` vs `Carousel`**: on Fire TV, the TV-native Carousel gives smoother scrolling, faster focus, and lower memory pressure than the general-purpose FlatList. On web and TVOS, FlatList is the right tool.
+- **`FlatList` vs `Carousel`**: platform-specific files let Vega use its Carousel while the other platforms use React Native's `FlatList`. Step 6 shows you how to compare their scrolling performance on Vega.
 
-In [Step 6](./step-06-testing.md), you'll add tests to lock down the movie list behaviour.
+In [Step 6](./step-06-test-scrolling-performance-with-adbt.md), you'll measure both list implementations on a physical Vega device and compare the results.
 
 ---
 
-**Next:** [Step 6: Testing →](./step-06-testing.md)
+**Next:** [Step 6: Compare scrolling performance on Vega →](./step-06-test-scrolling-performance-with-adbt.md)
