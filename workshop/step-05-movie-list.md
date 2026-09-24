@@ -398,7 +398,7 @@ yarn vega:vvd:mseries  # or yarn vega:vvd:intel
 
 Focus the **Movies** tile. You should see a spinner briefly, then a horizontal carousel of posters. Use the D-pad to scroll left and right, and watch how the focused poster scales up.
 
-![Movies tile focused, showing the Carousel of posters on the Vega Virtual Device](./images/step-05-movies-vega.png)
+![Movies tile focused, showing the Carousel of posters on the Vega Virtual Device](./images/step-05-movies-vega.gif)
 
 Now run on web:
 
