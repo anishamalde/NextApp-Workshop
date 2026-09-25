@@ -12,6 +12,12 @@ The prompt turns the Hello World screen into a small streaming-style TV experien
 - Simple video playback
 - Shared code for Vega, Expo TV, and web
 
+## Completed app
+
+After implementing the prompt, the final browse screen should look similar to this:
+
+![Completed streaming TV app showing the featured movie and horizontal movie row](./images/step-07-streaming-app-vega.png)
+
 The result is inspired by the [React Native Multi-TV App Sample](https://github.com/AmazonAppDev/react-native-multi-tv-app-sample), but keeps the app small enough to explore during the workshop.
 
 ## Explore the example
@@ -68,11 +74,32 @@ Use the D-pad to move through the movie row and check that:
 4. Play/Pause works.
 5. Back or Exit returns to the movie row.
 
+Manual testing with the Virtual Device remote is enough for this step. Appium
+and the Kepler performance API are not required.
+
 Now run on web:
 
 ```bash
 yarn expotv:web
 ```
+
+Wait for Metro to report that the web bundle completed, then open the local URL
+it prints. A successful TypeScript check alone does not confirm that Metro can
+resolve the web application.
+
+## Troubleshooting the generated app
+
+- **A video returns 403 or stays blank:** Replace it with a reachable HTTPS MP4
+  URL. Public sample media URLs can change or restrict where they are used.
+- **The controls disappear and the remote stops responding:** Keep hidden
+  controls mounted or restore focus when showing them. Unmounting the focused
+  button loses the D-pad focus target.
+- **Metro resolves `react` to `@types/react`:** A type-only `tsconfig` path has
+  leaked into runtime resolution. Keep React type mappings out of Metro while
+  preserving the existing `@/*` source alias.
+- **Vega shows no video:** Confirm that the W3C Media dependency, Babel setup,
+  manifest services, and required W3C Media modules from the prompt were all
+  added.
 
 ## Try another feature
 
