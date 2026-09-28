@@ -1,5 +1,3 @@
-// Jest setup file for React Native testing
-
 // Suppress React Native Image prop type warnings in tests
 const originalError = console.error;
 const originalWarn = console.warn;

@@ -16,7 +16,7 @@ export interface TileProps {
   isFocused: boolean;
   isActive?: boolean;
   onFocus: (id: string) => void;
-  onBlur: () => void;
+  onBlur: (id: string) => void;
   testID?: string;
   accessibilityLabel?: string;
   hasTVPreferredFocus?: boolean;
@@ -36,6 +36,7 @@ export const Tile = memo(
     hasTVPreferredFocus,
   }: TileProps) => {
     const handleFocus = useCallback(() => onFocus(id), [id, onFocus]);
+    const handleBlur = useCallback(() => onBlur(id), [id, onBlur]);
 
     const stateStyle = isFocused
       ? styles.focused
@@ -47,7 +48,7 @@ export const Tile = memo(
       <TouchableOpacity
         style={[styles.tile, stateStyle]}
         onFocus={handleFocus}
-        onBlur={onBlur}
+        onBlur={handleBlur}
         testID={testID}
         accessibilityLabel={accessibilityLabel}
         accessibilityRole="button"
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
   },
   active: {
     backgroundColor: '#0074B8',
-    borderColor: '#FF6200',
+    borderColor: '#B3E5FC',
   },
   focused: {
     backgroundColor: '#FF6200',

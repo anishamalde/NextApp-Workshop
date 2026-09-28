@@ -40,7 +40,17 @@
       "splash": {
         "image": "./assets/images/splash.png"
       },
-      "bundleIdentifier": "com.anonymous.MyTVProject"
+      "bundleIdentifier": "com.anonymous.MyTVProject",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSExceptionDomains": {
+            "official-joke-api.appspot.com": {
+              "NSExceptionAllowsInsecureHTTPLoads": true,
+              "NSIncludesSubdomains": true
+            }
+          }
+        }
+      }
     },
     "web": {
       "bundler": "metro",

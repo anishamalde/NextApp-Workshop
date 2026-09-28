@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   container: {
     width: scaleWidth(480),
     marginRight: scaleWidth(30),
-    opacity: 0.5,
+    opacity: 0.3,
   },
   containerFocused: {
     opacity: 1,

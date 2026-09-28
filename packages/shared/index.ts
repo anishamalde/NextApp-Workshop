@@ -12,6 +12,5 @@ export {
   scaleHeight,
 } from './src/utils/scaling';
 
-// HTTP Client (fetch-based)
 export {createHttpClient} from './src/services/httpClient';
 export type {HttpClientConfig, HttpResponse} from './src/services/httpClient';

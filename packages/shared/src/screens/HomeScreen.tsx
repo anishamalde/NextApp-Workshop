@@ -8,7 +8,7 @@ import {ApiDemo} from '../components/ApiDemo';
 import {IconReactNativeAnimated} from '../components/IconReactNativeAnimated/IconReactNativeAnimated';
 import {Header} from '../components/Header/Header';
 
-import {scaleFontSize, scaleWidth, scaleHeight} from '../utils/scaling';
+import {scaleFontSize, scaleWidth} from '../utils/scaling';
 
 export const HomeScreen = () => {
   const [activeTileId, setActiveTileId] = useState<string>('home');
@@ -21,8 +21,8 @@ export const HomeScreen = () => {
     setFocusedTileId(tileId);
   }, []);
 
-  const handleTileBlur = useCallback(() => {
-    setFocusedTileId(null);
+  const handleTileBlur = useCallback((tileId: string) => {
+    setFocusedTileId(prev => (prev === tileId ? null : prev));
   }, []);
 
   const renderFocusedContent = () => {

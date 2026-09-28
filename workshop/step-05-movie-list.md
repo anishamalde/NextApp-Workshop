@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   container: {
     width: scaleWidth(480),
     marginRight: scaleWidth(30),
-    opacity: 0.5,
+    opacity: 0.3,
   },
   containerFocused: {
     opacity: 1,
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
   },
   active: {
     backgroundColor: '#0074B8',
-    borderColor: '#FF6200',
+    borderColor: '#B3E5FC',
   },
   focused: {
     backgroundColor: '#FF6200',
@@ -511,7 +511,17 @@ tileRowContent: {
 
 Now the full flow works: focus Movies → the Carousel takes focus on mount (via `hasPreferredFocus`) → scroll with Left/Right → press Down → the tile row `FocusRow` remembers Movies was last focused and puts focus back there.
 
-On Android TV, one residual quirk: pressing **Right** from the Movies tile can jump into the Carousel above rather than along to the next tile. That's Android TV's proximity-based focus engine choosing the nearer element. Down brings you back. Vega doesn't do this.
+### Optional next step: iOS focus tuning
+
+Once you have the movie list working on Apple TV, you'll notice focus doesn't feel quite as smooth as it does on Android or Vega. Everything below is optional — the workshop doesn't ask you to fix it — but it's a useful extension if you want to dig into how the tvOS focus engine really works. Skip straight to 5.9 if you'd rather move on.
+
+You'll also notice focus behaves a little oddly on Apple TV — pressing **Down** from a poster doesn't always return to the Movies tile. It lands on whichever tile is geometrically closest to the focused poster. That's tvOS's proximity-based focus engine overriding the tile row's `autoFocus`. Android TV does something similar in the other direction: pressing **Right** from the Movies tile can jump up into the Carousel rather than moving along to the next tile. Vega doesn't do either.
+
+As a next step, try wiring up `TVFocusGuideView`'s `destinations` prop to override proximity — you point the movie row's focus guide at a ref to the tile row, and Down goes back there regardless of where the poster sits on screen. It's a good exercise in how the tvOS focus engine composes, and a nudge into the parts of `react-native-tvos` that go beyond `autoFocus`.
+
+You may also spot that the first poster only picks up focus on Apple TV once you press **Up** into the movie row — on Android TV and Vega it lights up the moment Movies becomes active. That's `hasTVPreferredFocus` behaving differently across the two platforms. On Android, the underlying view calls `requestFocus()` on itself shortly after mount, so focus gets pulled from the tile onto the poster automatically. On tvOS, the prop just marks the poster as its parent view controller's *preferred focused environment* — tvOS only reads that value during a focus-update cycle, and mounting a subtree doesn't trigger one. Focus stays wherever it was.
+
+Another next-step exercise, then: force a focus-update on iOS after mount. The usual options are calling `requestTVFocus()` on a `ref` inside a `useEffect`, or restructuring so the movie row is inside a `TVFocusGuideView` that already has focus when it renders. Same story as the proximity quirk — tvOS's focus engine is passive, so on iOS you nudge it explicitly.
 
 ## 5.9 Export the new pieces
 
