@@ -11,15 +11,13 @@ Smooth scrolling is important on TV. Dropped frames can make navigation feel slo
 
 This also builds on the platform file extension pattern from [Step 2](./step-02-shared-header.md). You'll temporarily hide `MovieList.kepler.tsx` so Vega uses the shared `MovieList.tsx` file instead.
 
-The Vega Virtual Device is useful for rehearsing the test scenario, but do not
-use simulator scores for this comparison. Simulator performance reflects the
-host computer rather than production Fire TV hardware.
+You can use the Vega Virtual Device to rehearse the test, but run the comparison
+on a physical device. Simulator scores reflect the host computer rather than
+production Fire TV hardware.
 
-Before continuing, launch the app and confirm that it still shows the Step 5
-screen: the navigation tile row and the horizontal movie list must both be
-visible. If you have already completed Step 7, restore the Step 5 screen before
-running this comparison. Otherwise, the scenario below will not measure either
-`MovieList` implementation.
+Before you start, launch the app and check that the navigation tiles and
+horizontal movie list from Step 5 are visible. The scenario only measures
+`MovieList` when this screen is active.
 
 ## 6.1 Understand what you'll measure
 
@@ -33,11 +31,10 @@ UI Fluidity measures how smoothly the app renders while focus moves through the 
 
 KPI Visualizer runs three iterations and displays a P90 score. Record that score for each component.
 
-Do not use KPI Visualizer's generic default scrolling test for this app. The app
-starts with focus on the Home tile, so generic D-pad actions can remain in the
-tile row instead of entering the movie list. In section 6.3, you'll create one
-custom scenario that navigates to Movies, moves focus up into the list, and
-scrolls horizontally. Use that same script for both measurements.
+KPI Visualizer's default test scrolls the front page. In this app, focus starts
+on the Home tile, so the test might stay in the tile row instead of entering the
+movie list. In section 6.3, you'll create a custom scenario that enters the list
+and scrolls horizontally. Use the same scenario for both measurements.
 
 ## 6.2 Prepare the Vega device
 
@@ -58,16 +55,16 @@ step:
 DEVICE_SERIAL=YOUR_PHYSICAL_DEVICE_SERIAL
 ```
 
-UI Fluidity testing requires Appium `2.2.2` and the Vega `kepler` Appium driver
-`3.30.0`. Check the installed versions first:
+UI Fluidity testing requires Appium `2.2.2` and the Vega `kepler` driver
+`3.30.0`. Check whether they are already installed:
 
 ```bash
 appium --version
 appium driver list
 ```
 
-The version command must print `2.2.2`, and the driver list must show `kepler`
-`3.30.0` as installed. If either dependency is missing, install it:
+You should see Appium `2.2.2` and `kepler` `3.30.0`. If either is missing,
+install it:
 
 ```bash
 npm install -g appium@2.2.2
@@ -75,16 +72,14 @@ appium driver install \
   --source=npm @amazon-devices/appium-kepler-driver@3.30.0
 ```
 
-Do not reinstall a driver that already has the required version. If a different
-Appium or `kepler` driver version is installed, follow Amazon's
+If a different version is installed, follow Amazon's
 [Appium installation guide](https://developer.amazon.com/docs/vega/0.24/appium-install.html)
-to remove the incompatible version before installing the required one.
+to remove it before installing the required version.
 
-Amazon's general KPI Visualizer prerequisites also list
-`@amazon-devices/kepler-performance-api`. This UI-only scenario does not call
-its app-side marker APIs, so it is not required for this workshop measurement.
-Only install it if `perf doctor` or your installed Vega SDK explicitly reports
-that it is missing:
+The general KPI Visualizer prerequisites also list
+`@amazon-devices/kepler-performance-api`. You do not need it for this UI-only
+test because the scenario does not use its marker APIs. If your Vega SDK reports
+that it is missing, install it:
 
 ```bash
 yarn workspace @multitv/vega add \
@@ -99,15 +94,12 @@ vega exec perf doctor \
   --device-serial-number "$DEVICE_SERIAL"
 ```
 
-Read the final doctor summary rather than relying only on the command's exit
-code. Resolve relevant errors and warnings — especially device connectivity,
-network, app installation, Appium, and driver issues — before continuing.
+Read the final summary and resolve any relevant errors or warnings before
+continuing.
 
-On some physical Vega device and CLI combinations, `perf doctor` can report
-that the network is disconnected even though the device is online. If that is
-the only remaining warning, confirm that VDA remains connected and that the app
-can load its remote catalog or images. If both checks pass, note the warning and
-continue. Do not ignore the warning if app content also fails to load.
+On some physical devices, `perf doctor` can report a network warning even when
+the device is online. If it is the only warning, check that VDA is still
+connected and that the app can load its movie images. If both work, continue.
 
 ## 6.3 Create and run the movie-list scenario
 
@@ -168,21 +160,14 @@ method bodies with the following:
             self._press(self.KEY_LEFT)
 ```
 
-`prep` places both implementations in the same ready state and returns focus to
-the first poster. `run` contains only the interaction whose fluidity you want to
-compare. Watch the first iteration and confirm that focus enters the movie list
-and moves across posters. Stop the test and fix the scenario if it remains in
-the tile row.
+`prep` puts both implementations in the same starting state. `run` contains only
+the horizontal scrolling you want to compare.
 
-KPI Visualizer closes the app after each iteration and launches it again for the
-next one. A brief app exit between iterations is expected; the Fire TV
-screensaver replacing the app during the scenario is not.
-
-Keep the TV awake and wake it with the physical remote immediately before
-starting the measurement. If the screensaver appears while KPI Visualizer is
-preparing or running, cancel the test, wake the device, relaunch the app, and
-start again. Do not press remote buttons during the measured `run` section,
-because extra input would make the comparison invalid.
+Watch the first iteration and check that focus moves across the movie posters.
+KPI Visualizer closes and relaunches the app between iterations, so a brief exit
+is expected. If the screensaver appears, cancel the test, wake the device, and
+start again. Do not use the remote during `run`, because extra input would
+change the comparison.
 
 You can run the measurement with Amazon Devices Builder Tools (ADBT), or
 directly with Vega Studio or the CLI. Use the same option and the same scenario
@@ -234,13 +219,11 @@ vega exec perf kpi-visualizer \
 
 After the test, use **Vega: Open Recording View** to open the report.
 
-An Appium-driven run can leave the separate **Key pressed latency** and
-**Key released latency** rows empty, which may make the final validator print
-`VALUE VALIDATION FAILED`. For this exercise, the UI Fluidity result is usable
-when all three iterations complete, **Fluidity % P90** is numeric, and you
-observed focus moving through the movie posters. Do not use a run where the
-movie list did not actually scroll, the report shows `null` or `N/A` fluidity,
-or the report contains no measured rendering surfaces.
+An Appium run can leave **Key pressed latency** and **Key released latency**
+empty, causing the final validator to print `VALUE VALIDATION FAILED`. You can
+still use the UI Fluidity result when all three iterations complete, the
+**Fluidity % P90** value is numeric, and you saw the posters scroll. Discard a
+run that shows `null`, `N/A`, or no measured rendering surfaces.
 
 These steps follow Amazon's [Measure App KPIs](https://developer.amazon.com/docs/vega/0.24/measure-app-kpis.html) documentation.
 
