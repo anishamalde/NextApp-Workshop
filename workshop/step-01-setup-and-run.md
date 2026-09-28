@@ -98,17 +98,20 @@ You should see a tile-based UI with four tiles: Home, Get Started, Test & Debug,
 
 Before you can deploy to a real Fire TV Stick, put the device into **developer mode**. Follow the [Enable Developer Mode guide](https://developer.amazon.com/docs/vega/0.24/developer-mode.html) — it walks you through enabling ADB debugging on the device, pairing it with your machine, and grabbing the DSN (device serial number) you'll pass to the `vega run-app` command below.
 
-Once developer mode is on and you have the DSN, replace `<DSN>` in the commands below:
+Once developer mode is on and you have the DSN, replace `<DSN>` in the commands below. The default `yarn vega:firetv` deploys the **debug** build produced by `yarn vega:build` above, which keeps Fast Refresh working on the stick:
 
 ```bash
-# Using the yarn script
+# Debug build (matches yarn vega:build; Fast Refresh available)
 yarn vega:firetv <DSN>
+yarn vega:firetv:debug <DSN>      # same thing, explicit
 
 # Or directly
-vega run-app packages/vega/build/armv7-release/vega_armv7.vpkg com.amazondeveloper.hellosharedworkspace.main -d <DSN>
+vega run-app packages/vega/build/armv7-debug/vega_armv7.vpkg com.amazondeveloper.hellosharedworkspace.main -d <DSN>
 ```
 
-The `vega run-app` command takes the form `vega run-app <Vpkg path> <App ID> -d <device>`. The App ID is the interactive component id from `manifest.toml` (here, `com.amazondeveloper.hellosharedworkspace.main`). Use `VirtualDevice` for the VVD or the device serial number (DSN) for a Fire TV Stick. See the [Vega CLI reference](https://developer.amazon.com/docs/vega/0.24/cli-tools.html) for details.
+Step 6 uses a Release build for perf comparisons; there's a `yarn vega:firetv:release <DSN>` script for that path.
+
+The `vega run-app` command takes the form `vega run-app <Vpkg path> <App ID> -d <device>`. The App ID is the interactive component id from `manifest.toml` (here, `com.amazondeveloper.hellosharedworkspace.main`). Use the device serial number (DSN) for a Fire TV Stick, or pass a specific Virtual Device serial from `vega exec vda devices` when more than one is attached. See the [Vega CLI reference](https://developer.amazon.com/docs/vega/0.24/cli-tools.html) for details.
 
 [Fast Refresh](https://reactnative.dev/docs/fast-refresh) is available in debug builds. See [Set Up Fast Refresh](https://developer.amazon.com/docs/vega/0.24/fast-refresh.html) for configuration.
 
@@ -124,6 +127,8 @@ Prebuild the native projects first (only needed for Android TV and Apple TV):
 yarn expotv:prebuild
 ```
 
+That script runs `EXPO_TV=1 expo prebuild --clean` under the hood. The `EXPO_TV=1` flag is what turns Expo's generated native project into a *TV* app rather than a phone app: on Android it adds the `LEANBACK_LAUNCHER` intent category to `AndroidManifest.xml` so the launcher on the TV knows to show your app, and on iOS it targets the `tvos` platform. Without it, Android TV would install your app but never surface it on the home screen.
+
 Then run on your target platform:
 
 **Web (no extra setup needed):**
@@ -138,11 +143,28 @@ yarn expotv:web
 yarn expotv:android
 ```
 
+If you have more than one emulator or device attached (for example a Vega Virtual Device *and* an Android TV emulator), Expo will pick the first one it finds — often the wrong one. Pass the Android TV AVD name explicitly:
+
+```bash
+yarn expotv android --device <YourAvdName>
+# e.g. yarn expotv android --device Television_1080p_API_34_2
+```
+
+Find the AVD name with `emulator -list-avds`. It's independent of the `emulator-XXXX` adb serial (which changes between runs).
+
 **Apple TV (requires Xcode):**
 
 ```bash
 yarn expotv:ios
 ```
+
+If you have several Apple TV simulators installed, Expo may pick the wrong one. Pass the simulator name explicitly:
+
+```bash
+yarn expotv ios --device "Apple TV 4K (3rd generation)"
+```
+
+List the simulators with `xcrun simctl list devicetypes | grep TV`.
 
 For the rest of this workshop, we'll show `yarn expotv:web` as the second platform command. Substitute your preferred target if you'd rather see it on a TV emulator.
 

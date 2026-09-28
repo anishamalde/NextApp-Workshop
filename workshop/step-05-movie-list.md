@@ -2,7 +2,7 @@
 
 In this step, you'll replace the **Test & Debug** tile with a **Movies** tile that fetches a movie catalog from a public endpoint and renders it as a horizontal list. On Expo TV and web you'll use `FlatList`. On Vega you'll use the TV-optimised **Carousel** from `@amazon-devices/vega-carousel`.
 
-This builds directly on the fetch pattern from [Step 4](./step-04-add-api-demo.md). The httpClient you wrote there will do the network call. What's new here is how the same fetched data flows into two different list components depending on the platform.
+This builds on the fetch pattern from [Step 4](./step-04-add-api-demo.md) — the httpClient you wrote there does the network call. What's new is how the same fetched data flows into different list components per platform.
 
 ## 5.1 Add a catalog service and hook
 
@@ -57,13 +57,13 @@ export function useMovies(): UseMoviesResult {
   useEffect(() => {
     let cancelled = false;
     fetchCatalog()
-      .then((catalog) => {
+      .then(catalog => {
         if (!cancelled) {
           setMovies(catalog.items);
           setLoading(false);
         }
       })
-      .catch((err) => {
+      .catch(err => {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : 'Unknown error');
           setLoading(false);
@@ -78,11 +78,7 @@ export function useMovies(): UseMoviesResult {
 }
 ```
 
-A few things worth noticing:
-
-- `fetchCatalog` uses the same `createHttpClient` from Step 4. No new networking code, just a new endpoint.
-- `useMovies` wraps the fetch in a hook so both list variants (FlatList and Carousel) can share the loading/error/data flow.
-- The `cancelled` flag stops us setting state on an unmounted component, which is easy to trip over when a user navigates away mid-fetch on a TV.
+The `cancelled` flag stops us setting state on an unmounted component — easy to trip over when a user navigates away mid-fetch on a TV.
 
 ## 5.2 Create a shared MoviePoster component
 
@@ -96,10 +92,12 @@ import {Movie} from '../../data/catalog';
 
 export interface MoviePosterProps {
   movie: Movie;
+  hasTVPreferredFocus?: boolean;
 }
 
-export const MoviePoster = ({movie}: MoviePosterProps) => {
+export const MoviePoster = ({movie, hasTVPreferredFocus}: MoviePosterProps) => {
   const [focused, setFocused] = useState(false);
+
   const onFocus = useCallback(() => setFocused(true), []);
   const onBlur = useCallback(() => setFocused(false), []);
 
@@ -107,6 +105,7 @@ export const MoviePoster = ({movie}: MoviePosterProps) => {
     <Pressable
       onFocus={onFocus}
       onBlur={onBlur}
+      hasTVPreferredFocus={hasTVPreferredFocus}
       style={[styles.container, focused && styles.containerFocused]}>
       <Image
         source={{uri: movie.images.poster_16x9}}
@@ -127,9 +126,11 @@ const styles = StyleSheet.create({
   container: {
     width: scaleWidth(480),
     marginRight: scaleWidth(30),
+    opacity: 0.5,
   },
   containerFocused: {
-    transform: [{scale: 1.1}],
+    opacity: 1,
+    transform: [{scale: 1.05}],
   },
   poster: {
     width: scaleWidth(480),
@@ -151,9 +152,42 @@ const styles = StyleSheet.create({
 });
 ```
 
-Same `onFocus`/`onBlur` scaling pattern from earlier steps: when D-pad focus lands on a poster, it grows.
+## 5.3 Create a FocusRow wrapper
 
-## 5.3 Create the FlatList variant
+Both list variants (FlatList and Carousel) need the same thing from their container: something that pulls D-pad focus in and remembers which child was last focused. Every platform has this primitive under a different name — wrap the differences behind a shared `FocusRow` using platform file extensions, same pattern as `HeaderLogo` in Step 2.
+
+`packages/shared/src/components/FocusRow/FocusRow.tsx` (Android TV and Apple TV, via `react-native-tvos`):
+
+```tsx
+import React from 'react';
+import {ViewStyle, StyleProp} from 'react-native';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const {TVFocusGuideView} = require('react-native');
+
+export interface FocusRowProps {
+  children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+  contentContainerStyle?: StyleProp<ViewStyle>;
+}
+
+export const FocusRow = ({children, style, contentContainerStyle}: FocusRowProps) => {
+  return (
+    <TVFocusGuideView autoFocus style={[style, contentContainerStyle]}>
+      {children}
+    </TVFocusGuideView>
+  );
+};
+```
+
+The other two variants use the same props and body — only the wrapper changes:
+
+- **`FocusRow.web.tsx`** — swap `TVFocusGuideView` for a plain `View` (browsers don't have TV focus).
+- **`FocusRow.kepler.tsx`** — import `TVFocusGuideView` from `@amazon-devices/react-native-kepler` instead of `react-native` (Vega's guide lives in a separate package).
+
+`autoFocus` does the work: when focus enters the row, the guide re-focuses whichever child was last focused (or the first focusable child on first visit).
+
+## 5.4 Create the FlatList variant
 
 Create `packages/shared/src/components/MovieList/MovieList.tsx`. This is the default, used by Web, Android TV, and Apple TV:
 
@@ -168,6 +202,7 @@ import {
 } from 'react-native';
 import {useMovies, Movie} from '../../data/catalog';
 import {MoviePoster} from './MoviePoster';
+import {FocusRow} from '../FocusRow/FocusRow';
 import {scaleFontSize, scaleWidth, scaleHeight} from '../../utils/scaling';
 
 export const MovieList = () => {
@@ -190,19 +225,27 @@ export const MovieList = () => {
   }
 
   return (
-    <FlatList
-      horizontal
-      data={movies}
-      keyExtractor={(item: Movie) => item.id}
-      renderItem={({item}) => <MoviePoster movie={item} />}
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.content}
-      style={styles.list}
-    />
+    <FocusRow style={styles.container}>
+      <FlatList
+        horizontal
+        data={movies}
+        keyExtractor={(item: Movie) => item.id}
+        renderItem={({item, index}) => (
+          <MoviePoster movie={item} hasTVPreferredFocus={index === 0} />
+        )}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+        style={styles.list}
+      />
+    </FocusRow>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    height: scaleHeight(400),
+  },
   list: {
     width: '100%',
   },
@@ -222,9 +265,12 @@ const styles = StyleSheet.create({
 });
 ```
 
-`FlatList` virtualises rows and only renders what's on screen plus a small buffer. That's plenty for a 25-item catalog and it keeps scroll smooth on web and TVOS.
+A few things worth noticing:
 
-## 5.4 Create the Vega Carousel variant
+- **`FocusRow` wraps the `FlatList`.** `autoFocus` pulls D-pad focus into the list, and the native `ScrollView` inside `FlatList` scrolls the focused poster into view on its own — same visual outcome as the Vega Carousel, no `scrollToIndex` needed.
+- **`container` has a fixed `height`.** Without it the `FlatList` stretches vertically and overlaps the tile row below.
+
+## 5.5 Create the Vega Carousel variant
 
 For Vega, swap `FlatList` for the Amazon Devices Carousel. It has a slightly different API — a `dataAdapter` object instead of a `data` array — but the same `useMovies` hook feeds it. Create `packages/shared/src/components/MovieList/MovieList.kepler.tsx`:
 
@@ -232,9 +278,9 @@ For Vega, swap `FlatList` for the Amazon Devices Carousel. It has a slightly dif
 import React, {useCallback} from 'react';
 import {Text, ActivityIndicator, StyleSheet} from 'react-native';
 import {Carousel, CarouselRenderInfo} from '@amazon-devices/vega-carousel';
-import {TVFocusGuideView} from '@amazon-devices/react-native-kepler';
 import {useMovies, Movie} from '../../data/catalog';
 import {MoviePoster} from './MoviePoster';
+import {FocusRow} from '../FocusRow/FocusRow';
 import {scaleFontSize, scaleWidth, scaleHeight} from '../../utils/scaling';
 
 export const MovieList = () => {
@@ -253,9 +299,7 @@ export const MovieList = () => {
   );
 
   if (loading) {
-    return (
-      <ActivityIndicator size="large" color="#FFFFFF" style={styles.centered} />
-    );
+    return <ActivityIndicator size="large" color="#FFFFFF" style={styles.centered} />;
   }
   if (error) {
     return <Text style={styles.error}>{error}</Text>;
@@ -265,13 +309,14 @@ export const MovieList = () => {
   }
 
   return (
-    <TVFocusGuideView autoFocus={true} style={styles.container}>
+    <FocusRow style={styles.container}>
       <Carousel
         dataAdapter={{getItem, getItemCount, getItemKey, notifyDataError}}
         renderItem={renderItem}
         uniqueId="movie-carousel"
+        hasPreferredFocus={true}
       />
-    </TVFocusGuideView>
+    </FocusRow>
   );
 };
 
@@ -288,16 +333,13 @@ const styles = StyleSheet.create({
 
 A few things worth noticing:
 
-- The `dataAdapter` gives the Carousel functions to look up items by index. It uses that to recycle views efficiently for very large catalogs.
-- **`getItem` must return `undefined` for out-of-bounds indices.** The Carousel probes indices beyond the current count during scroll, and returning `movies[index]` directly (which would be `undefined`) crashes native code that expects a valid item shape. Guard the bounds explicitly.
-- **`getItemKey` receives a `CarouselRenderInfo`, not a raw index.** It's `(info) => key`, where `info.item` and `info.index` are available — different from a `FlatList` `keyExtractor`.
-- We short-circuit with `if (movies.length === 0) return null` so the Carousel is never mounted with an empty adapter.
-- `TVFocusGuideView` with `autoFocus` wraps the Carousel so pressing **Up** from the Movies tile hands focus into the carousel row. Without it, focus would just stay on the tile row.
-- We're relying on defaults for `orientation`, `renderedItemsCount`, `numOffsetItems`, and `initialStartIndex`. All of those are perf knobs you can tune later (see the docs) — the defaults are fine for a 25-item catalog.
+- **`dataAdapter` replaces `data`.** The Carousel doesn't take an array — you give it `getItem`, `getItemCount`, and `getItemKey` so it can recycle views for very large catalogs.
+- **`getItem` must return `undefined` for out-of-bounds indices.** The Carousel probes past the current count during scroll; returning `movies[index]` directly (which is `undefined`) crashes native code that expects a valid item.
+- **`hasPreferredFocus={true}`** makes focus jump straight to the first poster the moment `MovieList` mounts — no extra Up press. It doesn't retrigger on return, so the user can navigate away normally.
 
-For the full prop reference, see the [Vega Carousel docs](https://developer.amazon.com/docs/vega-api/0.24/vega-carousel.html) and [Focus Management on Vega](https://developer.amazon.com/docs/vega/0.24/focus-management.html).
+Everything else uses the Carousel's defaults; see the [Vega Carousel docs](https://developer.amazon.com/docs/vega-api/0.24/vega-carousel.html) if you want to tune.
 
-## 5.5 Add the Vega Carousel dependency
+## 5.6 Add the Vega Carousel dependency
 
 Update `packages/vega/package.json` to include the new package:
 
@@ -314,7 +356,7 @@ Then reinstall:
 yarn
 ```
 
-## 5.6 Replace the Test & Debug tile
+## 5.7 Replace the Test & Debug tile
 
 Open `packages/shared/src/data/tiles.tsx` and swap the `debug` tile for a `movies` tile:
 
@@ -331,52 +373,147 @@ Open `packages/shared/src/data/tiles.tsx` and swap the `debug` tile for a `movie
 
 We're reusing the existing debug icon to keep the workshop simple. Swap it for something more movie-shaped if you like.
 
-## 5.7 Render the MovieList when Movies is focused
+## 5.8 Render the MovieList when Movies is focused
 
-Update `packages/shared/src/screens/HomeScreen.tsx` to render the list in the focused-content area:
+Update `packages/shared/src/screens/HomeScreen.tsx` to render the list when the Movies tile is focused:
 
 ```tsx
 // Add the import at the top
 import {MovieList} from '../components/MovieList/MovieList';
 
 // Then in renderFocusedContent, add the movies case above the fallback:
-if (focusedTileId === 'movies') {
+if (activeTileId === 'movies') {
   return <MovieList />;
 }
 ```
 
-Metro picks the right file automatically:
+Metro picks the right file automatically — `MovieList.kepler.tsx` on Vega, `MovieList.tsx` everywhere else. Same import path, no `Platform.select()` needed.
 
-- `MovieList.kepler.tsx` on Vega (Fire TV)
-- `MovieList.tsx` on Expo TV and web
+### Split "active" from "focused" so focus can leave the tile row
 
-Same import path, different implementations, no `Platform.select()` needed.
+`HomeScreen` currently uses one variable — `focusedTileId` — to track both "which tile owns the content area" and "which tile is highlighted". That breaks the moment focus needs to leave the tile row and enter the Carousel above: clearing it unmounts the MovieList; not clearing it leaves the Movies tile lit orange while a poster is also focused.
 
-### Stop resetting focus on tile blur
-
-The starter `HomeScreen` resets the focused-content area back to `'home'` whenever any tile blurs:
+Split the one variable into the two things it was actually tracking:
 
 ```tsx
+const [activeTileId, setActiveTileId] = useState<string>('home');
+const [focusedTileId, setFocusedTileId] = useState<string | null>('home');
+
+const handleTileFocus = useCallback((id: string) => {
+  setActiveTileId(id);
+  setFocusedTileId(id);
+}, []);
+
 const handleTileBlur = useCallback(() => {
-  setFocusedTileId('home');
+  setFocusedTileId(null);
 }, []);
 ```
 
-That was fine when tiles only ever showed a description. It's a problem now: pressing **Up** from the Movies tile blurs it, which unmounts the MovieList before focus can travel into the carousel. Focus falls back to the home tile instead.
+`activeTileId` never goes null, so the content area stays mounted while focus travels up into it. `focusedTileId` goes null on blur so the tile's orange highlight clears when focus moves into the Carousel.
 
-Change the blur handler to a no-op so the last-focused content stays mounted while focus moves up into it:
+`Tile` also gets a third visual state so it can show "I own the content but I don't have focus" — **active** sits between **default** and **focused**. In `packages/shared/src/components/Tile.tsx`, add an `isActive?: boolean` prop and pick the right style block:
 
 ```tsx
-const handleTileBlur = useCallback(() => {
-  // No-op: keep the focused-content area showing the last-focused tile's
-  // content so users can move focus up into it (e.g. into the Movies
-  // carousel) without unmounting it.
-}, []);
+export interface TileProps {
+  // ...existing props
+  isFocused: boolean;
+  isActive?: boolean;
+  // ...
+}
+
+const stateStyle = isFocused
+  ? styles.focused
+  : isActive
+    ? styles.active
+    : styles.default;
+
+return (
+  <TouchableOpacity style={[styles.tile, stateStyle]} /* ... */>
+    {/* ... */}
+  </TouchableOpacity>
+);
 ```
 
-Now the flow works: focus Movies → carousel appears → press Up → `TVFocusGuideView` hands focus to the carousel → press Down → focus returns to the tile row.
+Add the `active` style and give the base `tile` a `borderWidth` so the outline doesn't nudge the layout when it appears:
 
-## 5.8 Export the new pieces
+```tsx
+const styles = StyleSheet.create({
+  tile: {
+    // ...existing
+    borderWidth: scaleWidth(6),
+  },
+  default: {
+    backgroundColor: '#0074B8',
+    borderColor: 'transparent',
+  },
+  active: {
+    backgroundColor: '#0074B8',
+    borderColor: '#FF6200',
+  },
+  focused: {
+    backgroundColor: '#FF6200',
+    borderColor: '#FF6200',
+    transform: [{scale: 1.1}],
+    opacity: 1,
+  },
+  // ...
+});
+```
+
+Now wire the new state through in `HomeScreen`:
+
+```tsx
+<Tile
+  key={tile.id}
+  // ...existing props
+  isFocused={focusedTileId === tile.id}
+  isActive={focusedTileId !== tile.id && activeTileId === tile.id}
+  onFocus={handleTileFocus}
+  onBlur={handleTileBlur}
+/>
+```
+
+Finally, rename `focusedTileId` to `activeTileId` in the parts of `renderFocusedContent` that decide what to show (and `focusedTile` to `activeTile` in the fallback). The header area follows the active tile now, not focus — that's how the Movies content stays mounted after focus leaves the tile row.
+
+### Wrap the tile row in FocusRow
+
+The `FocusRow` from 5.3 fits the tile row too. Without it, pressing **Down** from the Carousel returns focus to whichever tile is geometrically below the focused poster — usually **Home**, not **Movies**. `autoFocus` remembers the last focused child so focus goes back to Movies.
+
+Swap the tile row's outer `<View>` for `<FocusRow>`:
+
+```tsx
+import {FocusRow} from '../components/FocusRow/FocusRow';
+
+// ...
+
+<FocusRow
+  style={styles.tileRowScroll}
+  contentContainerStyle={styles.tileRowContent}>
+  {tiles.map(tile => (
+    <Tile ... />
+  ))}
+</FocusRow>
+```
+
+Split the styles — outer for the flex slot, `contentContainerStyle` for the layout:
+
+```tsx
+tileRowScroll: {
+  flex: 1,
+},
+tileRowContent: {
+  flexGrow: 1,
+  flexDirection: 'row',
+  alignItems: 'flex-end',
+  justifyContent: 'space-between',
+},
+```
+
+Now the full flow works: focus Movies → the Carousel takes focus on mount (via `hasPreferredFocus`) → scroll with Left/Right → press Down → the tile row `FocusRow` remembers Movies was last focused and puts focus back there.
+
+On Android TV, one residual quirk: pressing **Right** from the Movies tile can jump into the Carousel above rather than along to the next tile. That's Android TV's proximity-based focus engine choosing the nearer element. Down brings you back. Vega doesn't do this.
+
+## 5.9 Export the new pieces
 
 Update `packages/shared/index.ts` so the movie list and hook are part of the shared public API:
 
@@ -387,7 +524,7 @@ export {fetchCatalog, useMovies} from './src/data/catalog';
 export type {Movie, Catalog} from './src/data/catalog';
 ```
 
-## 5.9 Run and compare
+## 5.10 Run and compare
 
 Build and run on Vega. In Vega Studio, click the play button in the sidebar (see [Step 1](./step-01-setup-and-run.md#option-a-build-and-run-from-vega-studio-ide)). Or from the CLI:
 
@@ -406,18 +543,15 @@ Now run on web:
 yarn expotv:web
 ```
 
-Or run on Android TV (`yarn expotv:android`) or Apple TV (`yarn expotv:ios`) if you have those emulators set up. See [Step 1: Run on another platform](./step-01-setup-and-run.md#13-run-on-another-platform).
-
-Same fetch, same posters, but rendered by `FlatList`. Scroll with the arrow keys.
+Or run on Android TV (`yarn expotv:android`) or Apple TV (`yarn expotv:ios`) if you have those emulators set up — see [Step 1: Run on another platform](./step-01-setup-and-run.md#13-run-on-another-platform). Same fetch, same posters, but rendered by `FlatList`. Scroll with the arrow keys.
 
 ## What you've learned
 
 - **Reusing shared services**: Step 4's httpClient handled the network call for a different endpoint with no changes.
 - **A shared hook, two views**: `useMovies` centralises the loading/error/data flow. Each list component just decides how to render.
-- **Platform file extensions for list components**: same import, different implementation per platform, no `Platform.select()`.
-- **`FlatList` vs `Carousel`**: platform-specific files let Vega use its Carousel while the other platforms use React Native's `FlatList`. Step 6 shows you how to compare their scrolling performance on Vega.
-
-In [Step 6](./step-06-test-scrolling-performance-with-adbt.md), you'll measure both list implementations on a physical Vega device and compare the results.
+- **`FocusRow` as a cross-platform focus guide**: one abstraction, three platform files. `TVFocusGuideView` from `react-native-tvos` on Android TV / Apple TV, from `@amazon-devices/react-native-kepler` on Vega, plain `View` on web.
+- **Splitting `active` from `focused`**: one state per intent avoids doubled focus indicators and lets focus leave the tile row without unmounting the content above.
+- **`FlatList` vs `Vega Carousel`**: platform-specific files let Vega use its native Carousel while everywhere else uses `FlatList`. Step 6 compares them on a real Vega device.
 
 ---
 
