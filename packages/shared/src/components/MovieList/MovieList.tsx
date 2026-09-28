@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import {useMovies, Movie} from '../../data/catalog';
 import {MoviePoster} from './MoviePoster';
+import {FocusRow} from '../FocusRow/FocusRow';
 import {scaleFontSize, scaleWidth, scaleHeight} from '../../utils/scaling';
 
 export const MovieList = () => {
@@ -30,19 +31,27 @@ export const MovieList = () => {
   }
 
   return (
-    <FlatList
-      horizontal
-      data={movies}
-      keyExtractor={(item: Movie) => item.id}
-      renderItem={({item}) => <MoviePoster movie={item} />}
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.content}
-      style={styles.list}
-    />
+    <FocusRow style={styles.container}>
+      <FlatList
+        horizontal
+        data={movies}
+        keyExtractor={(item: Movie) => item.id}
+        renderItem={({item, index}) => (
+          <MoviePoster movie={item} hasTVPreferredFocus={index === 0} />
+        )}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+        style={styles.list}
+      />
+    </FocusRow>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    height: scaleHeight(400),
+  },
   list: {
     width: '100%',
   },

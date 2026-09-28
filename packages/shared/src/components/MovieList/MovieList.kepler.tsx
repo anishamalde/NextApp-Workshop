@@ -1,9 +1,9 @@
 import React, {useCallback} from 'react';
 import {Text, ActivityIndicator, StyleSheet} from 'react-native';
 import {Carousel, CarouselRenderInfo} from '@amazon-devices/vega-carousel';
-import {TVFocusGuideView} from '@amazon-devices/react-native-kepler';
 import {useMovies, Movie} from '../../data/catalog';
 import {MoviePoster} from './MoviePoster';
+import {FocusRow} from '../FocusRow/FocusRow';
 import {scaleFontSize, scaleWidth, scaleHeight} from '../../utils/scaling';
 
 export const MovieList = () => {
@@ -32,13 +32,14 @@ export const MovieList = () => {
   }
 
   return (
-    <TVFocusGuideView autoFocus={true} style={styles.container}>
+    <FocusRow style={styles.container}>
       <Carousel
         dataAdapter={{getItem, getItemCount, getItemKey, notifyDataError}}
         renderItem={renderItem}
         uniqueId="movie-carousel"
+        hasPreferredFocus={true}
       />
-    </TVFocusGuideView>
+    </FocusRow>
   );
 };
 

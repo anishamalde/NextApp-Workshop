@@ -8,8 +8,10 @@
     "vega:vvd:mseries": "yarn workspace @multitv/vega run vvd:mseries",
     "vega:vvd:intel": "yarn workspace @multitv/vega run vvd:intel",
     "vega:firetv": "yarn workspace @multitv/vega run firetv",
+    "vega:firetv:debug": "yarn workspace @multitv/vega run firetv:debug",
+    "vega:firetv:release": "yarn workspace @multitv/vega run firetv:release",
     "expotv": "yarn workspace @multitv/expotv",
-    "expotv:prebuild": "yarn workspace @multitv/expotv run prebuild",
+    "expotv:prebuild": "yarn workspace @multitv/expotv run prebuild:tv",
     "expotv:android": "yarn workspace @multitv/expotv run android",
     "expotv:ios": "yarn workspace @multitv/expotv run ios",
     "expotv:web": "yarn workspace @multitv/expotv run web"

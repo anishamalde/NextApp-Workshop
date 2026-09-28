@@ -5,9 +5,10 @@ import {Movie} from '../../data/catalog';
 
 export interface MoviePosterProps {
   movie: Movie;
+  hasTVPreferredFocus?: boolean;
 }
 
-export const MoviePoster = ({movie}: MoviePosterProps) => {
+export const MoviePoster = ({movie, hasTVPreferredFocus}: MoviePosterProps) => {
   const [focused, setFocused] = useState(false);
 
   const onFocus = useCallback(() => setFocused(true), []);
@@ -17,6 +18,7 @@ export const MoviePoster = ({movie}: MoviePosterProps) => {
     <Pressable
       onFocus={onFocus}
       onBlur={onBlur}
+      hasTVPreferredFocus={hasTVPreferredFocus}
       style={[styles.container, focused && styles.containerFocused]}>
       <Image
         source={{uri: movie.images.poster_16x9}}
@@ -37,8 +39,10 @@ const styles = StyleSheet.create({
   container: {
     width: scaleWidth(480),
     marginRight: scaleWidth(30),
+    opacity: 0.5,
   },
   containerFocused: {
+    opacity: 1,
     transform: [{scale: 1.05}],
   },
   poster: {

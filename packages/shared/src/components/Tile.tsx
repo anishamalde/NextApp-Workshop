@@ -14,6 +14,7 @@ export interface TileProps {
   label: string;
   icon: ImageSourcePropType;
   isFocused: boolean;
+  isActive?: boolean;
   onFocus: (id: string) => void;
   onBlur: () => void;
   testID?: string;
@@ -27,6 +28,7 @@ export const Tile = memo(
     label,
     icon,
     isFocused,
+    isActive,
     onFocus,
     onBlur,
     testID,
@@ -35,9 +37,15 @@ export const Tile = memo(
   }: TileProps) => {
     const handleFocus = useCallback(() => onFocus(id), [id, onFocus]);
 
+    const stateStyle = isFocused
+      ? styles.focused
+      : isActive
+      ? styles.active
+      : styles.default;
+
     return (
       <TouchableOpacity
-        style={[styles.tile, isFocused ? styles.focused : styles.default]}
+        style={[styles.tile, stateStyle]}
         onFocus={handleFocus}
         onBlur={onBlur}
         testID={testID}
@@ -63,6 +71,7 @@ const styles = StyleSheet.create({
     borderRadius: scaleWidth(44),
     overflow: 'hidden',
     padding: scaleWidth(20),
+    borderWidth: scaleWidth(6),
   },
   topHalf: {
     flex: 1,
@@ -76,9 +85,15 @@ const styles = StyleSheet.create({
   },
   default: {
     backgroundColor: '#0074B8',
+    borderColor: 'transparent',
+  },
+  active: {
+    backgroundColor: '#0074B8',
+    borderColor: '#FF6200',
   },
   focused: {
     backgroundColor: '#FF6200',
+    borderColor: '#FF6200',
     transform: [{scale: 1.1}],
     opacity: 1,
   },
