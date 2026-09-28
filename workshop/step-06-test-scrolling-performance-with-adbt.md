@@ -16,7 +16,7 @@ on a physical device. Simulator scores reflect the host computer rather than
 production Fire TV hardware.
 
 Before you start, launch the app and check that the navigation tiles and
-horizontal movie list from Step 5 are visible. The scenario only measures
+horizontal movie list from Step 5 are visible. The test only measures
 `MovieList` when this screen is active.
 
 ## 6.1 Understand what you'll measure
@@ -31,10 +31,11 @@ UI Fluidity measures how smoothly the app renders while focus moves through the 
 
 KPI Visualizer runs three iterations and displays a P90 score. Record that score for each component.
 
-KPI Visualizer's default test scrolls the front page. In this app, focus starts
-on the Home tile, so the test might stay in the tile row instead of entering the
-movie list. In section 6.3, you'll create a custom scenario that enters the list
-and scrolls horizontally. Use the same scenario for both measurements.
+KPI Visualizer's default test sends repeated horizontal and vertical D-pad
+actions. In this app, the horizontal actions move focus from the Home tile to
+Movies. Step 5 then gives the movie list preferred focus, so the remaining
+Left/Right actions scroll through the posters. Use this same default test for
+both measurements.
 
 ## 6.2 Prepare the Vega device
 
@@ -78,8 +79,8 @@ to remove it before installing the required version.
 
 The general KPI Visualizer prerequisites also list
 `@amazon-devices/kepler-performance-api`. You do not need it for this UI-only
-test because the scenario does not use its marker APIs. If your Vega SDK reports
-that it is missing, install it:
+test because UI Fluidity does not use its app-side marker APIs. If your Vega SDK
+reports that it is missing, install it:
 
 ```bash
 yarn workspace @multitv/vega add \
@@ -101,77 +102,19 @@ On some physical devices, `perf doctor` can report a network warning even when
 the device is online. If it is the only warning, check that VDA is still
 connected and that the app can load its movie images. If both work, continue.
 
-## 6.3 Create and run the movie-list scenario
+## 6.3 Run the default UI Fluidity test
 
-Generate a custom scenario from the template supplied by the installed Vega
-SDK:
-
-```bash
-vega exec perf generate-test-template \
-  --app-name com.amazondeveloper.hellosharedworkspace.main \
-  --test-scenario-save-path workshop/movie-list-fluidity.py
-```
-
-The generated file already imports `time` and defines a `TestRunner` class.
-Inside that class, add `_press`, then replace the generated `prep` and `run`
-method bodies with the following:
-
-```python
-    KEY_LEFT = "105"
-    KEY_RIGHT = "106"
-    KEY_UP = "103"
-    KEY_DOWN = "108"
-
-    def _press(self, key_code: str, delay: float = 0.9) -> None:
-        if self.__driver is None:
-            raise RuntimeError("Appium driver is not available")
-
-        self.__driver.execute_script(
-            "jsonrpc: injectInputKeyEvent",
-            [{"inputKeyEvent": key_code, "holdDuration": 0}],
-        )
-        time.sleep(delay)
-
-    def prep(self) -> None:
-        # Normalize focus after launch: leave the movie row if necessary,
-        # move to the first tile, then focus Movies.
-        time.sleep(2)
-        self._press(self.KEY_DOWN)
-        for _ in range(4):
-            self._press(self.KEY_LEFT, delay=0.3)
-        self._press(self.KEY_RIGHT)
-        self._press(self.KEY_RIGHT)
-
-        # Wait for the catalog, enter the list, and warm the same poster range
-        # before each measured iteration.
-        time.sleep(5)
-        self._press(self.KEY_UP)
-        for _ in range(10):
-            self._press(self.KEY_RIGHT)
-        for _ in range(10):
-            self._press(self.KEY_LEFT)
-        time.sleep(2)
-
-    def run(self) -> None:
-        # Only this repeated horizontal scrolling is measured.
-        for _ in range(10):
-            self._press(self.KEY_RIGHT)
-        for _ in range(10):
-            self._press(self.KEY_LEFT)
-```
-
-`prep` puts both implementations in the same starting state. `run` contains only
-the horizontal scrolling you want to compare.
+The default test is enough for this comparison because Step 5 gives the movie
+list preferred focus when it appears. Use the default test for both components.
 
 Watch the first iteration and check that focus moves across the movie posters.
 KPI Visualizer closes and relaunches the app between iterations, so a brief exit
 is expected. If the screensaver appears, cancel the test, wake the device, and
-start again. Do not use the remote during `run`, because extra input would
-change the comparison.
+start again. Do not use the remote while the test is running, because extra
+input would change the comparison.
 
 You can run the measurement with Amazon Devices Builder Tools (ADBT), or
-directly with Vega Studio or the CLI. Use the same option and the same scenario
-file for both components.
+directly with Vega Studio or the CLI. Use the same option for both components.
 
 ### Option A: Use ADBT
 
@@ -181,10 +124,9 @@ Give your AI coding assistant this prompt:
 Use Amazon Devices Builder Tools to measure UI Fluidity for the installed Vega
 app com.amazondeveloper.hellosharedworkspace.main.
 
-Use workshop/movie-list-fluidity.py as the custom test scenario, the physical
-device serial from DEVICE_SERIAL, three iterations, and no CPU profiling. Do
-not change application code. Request the P90 report with
---show-percentiles 90.
+Use the default UI Fluidity test, the physical device serial from DEVICE_SERIAL,
+three iterations, and no CPU profiling. Do not change application code. Request
+the P90 report with --show-percentiles 90.
 
 Report the P90 Fluidity score and whether the test moved focus horizontally
 through the movie list.
@@ -201,9 +143,8 @@ In Vega Studio:
 2. Run **Vega: Launch App KPI Visualizer**.
 3. Select **Application UI Fluidity Test**.
 4. Leave **Record CPU Profiler** unselected.
-5. Choose **Yes** when asked for a custom test scenario.
-6. Select `workshop/movie-list-fluidity.py`.
-7. Use three iterations.
+5. Choose **No** when asked for a custom test scenario.
+6. Use three iterations.
 
 You can run the same test from the command line:
 
@@ -213,7 +154,6 @@ vega exec perf kpi-visualizer \
   --iterations 3 \
   --app-name com.amazondeveloper.hellosharedworkspace.main \
   --device-serial-number "$DEVICE_SERIAL" \
-  --test-scenario workshop/movie-list-fluidity.py \
   --show-percentiles 90
 ```
 
