@@ -1,0 +1,18 @@
+{
+  // Type-check only. Expo Metro reads tsconfig.json paths, so these mappings
+  // (which point shared package imports at this workspace's modules, including
+  // React's type package) live here, outside Metro's resolution.
+  "extends": "./tsconfig.json",
+  // expo-env.d.ts only exists after `expo start`, so include Expo's types here.
+  "files": ["node_modules/expo/types/index.d.ts"],
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@/*": ["./*"],
+      "react": ["./node_modules/@types/react"],
+      "react/*": ["./node_modules/@types/react/*"],
+      "react-native": ["./node_modules/react-native"],
+      "lottie-react-native": ["./node_modules/lottie-react-native"]
+    }
+  }
+}

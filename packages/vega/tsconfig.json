@@ -2,5 +2,13 @@
     "extends": "@tsconfig/react-native/tsconfig.json",
     "compilerOptions": {
         "types": ["jest", "@amazon-devices/react-native-kepler"], /* Override "jest", "react-native" from @tsconfig/react-native */
+        /* Let shared package files resolve the modules installed in this workspace */
+        "baseUrl": ".",
+        "paths": {
+            "react": ["node_modules/@types/react"],
+            "react-native": ["node_modules/react-native"],
+            "@amazon-devices/*": ["node_modules/@amazon-devices/*"],
+            "lottie-react-native": ["node_modules/@amazon-devices/lottie-react-native"]
+        },
     },
 }

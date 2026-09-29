@@ -1,3 +1,6 @@
+// RNTL built-in matchers such as toHaveTextContent
+import '@testing-library/react-native/extend-expect';
+
 // Jest setup file for React Native testing
 
 // Suppress React Native Image prop type warnings in tests

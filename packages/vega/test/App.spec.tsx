@@ -5,21 +5,17 @@
  */
 
 import 'react-native';
-import {fireEvent, render} from '@testing-library/react-native';
+import {render} from '@testing-library/react-native';
 import * as React from 'react';
 
 import {App} from '../src/App';
 
-describe('Template App Snapshot tests', () => {
-  it('Initial App screen', () => {
+describe('App', () => {
+  it('renders the home screen tiles', () => {
     const screen = render(<App />);
-    expect(screen).toMatchSnapshot();
-  });
 
-  it('App screen after link press', () => {
-    const screen = render(<App />);
-    const button = screen.getByTestId('sampleLink');
-    fireEvent.press(button);
-    expect(screen).toMatchSnapshot();
+    ['home', 'get-started', 'debug', 'learn-more'].forEach(id => {
+      expect(screen.getByTestId(`tile-${id}`)).toBeTruthy();
+    });
   });
 });
