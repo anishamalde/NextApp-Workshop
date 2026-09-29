@@ -2,6 +2,8 @@
 
 In this optional next step, you'll use an AI coding assistant to turn the workshop app into a small streaming-style TV experience.
 
+The prompt also leverages Amazon Devices Builder Tools (ADBT) so the assistant can build, launch, and validate the Vega app.
+
 This builds on the same shared components, platform-specific files, and D-pad focus patterns you used in the earlier steps. The difference is that you'll give the coding assistant a larger prompt, then change that prompt to try your own ideas.
 
 The prompt turns the Hello World screen into a small streaming-style TV experience with:
@@ -74,8 +76,7 @@ Use the D-pad to move through the movie row and check that:
 4. Play/Pause works.
 5. Back or Exit returns to the movie row.
 
-Manual testing with the Virtual Device remote is enough for this step. Appium
-and the Kepler performance API are not required.
+Use the Virtual Device remote for this functional check.
 
 Now run on web:
 
@@ -94,9 +95,6 @@ resolve the web application.
 - **The controls disappear and the remote stops responding:** Keep hidden
   controls mounted or restore focus when showing them. Unmounting the focused
   button loses the D-pad focus target.
-- **Metro resolves `react` to `@types/react`:** A type-only `tsconfig` path has
-  leaked into runtime resolution. Keep React type mappings out of Metro while
-  preserving the existing `@/*` source alias.
 - **Vega shows no video:** Confirm that the W3C Media dependency, Babel setup,
   manifest services, and required W3C Media modules from the prompt were all
   added.

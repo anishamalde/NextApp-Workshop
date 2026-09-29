@@ -49,7 +49,7 @@ vega exec vda devices
 
 If the list is empty, connect a physical Vega device before continuing. See [Step 1: Run on a Fire TV Stick](./step-01-setup-and-run.md#run-on-a-fire-tv-stick) if you need to configure the device.
 
-Copy the physical device serial from the first column and use it throughout the
+Copy the physical device serial shown in the output and use it throughout the
 step:
 
 ```bash
