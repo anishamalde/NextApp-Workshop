@@ -21,6 +21,10 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleNameMapper: {
     '\\.(jpg|jpeg|png|gif|svg|png)$': '<rootDir>/__mocks__/fileMock.js',
+    // Lightweight stand-ins for the platform video modules
+    '^react-native-video$': '<rootDir>/__mocks__/react-native-video.js',
+    '^@amazon-devices/react-native-w3cmedia$':
+      '<rootDir>/__mocks__/react-native-w3cmedia.js',
   },
   testEnvironment: 'node',
 };

@@ -27,6 +27,7 @@
     "@amazon-devices/kepler-module-resolver-preset": "^0.1.15",
     "@amazon-devices/lottie-react-native": "~2.0.0",
     "@amazon-devices/react-native-kepler": "^2.0.0",
+    "@amazon-devices/react-native-w3cmedia": "~2.1.80",
     "@amazon-devices/vega-carousel": "^0.1.0",
     "@multitv/shared": "*",
     "babel-plugin-module-resolver": "^5.0.2",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@amazon-devices/kepler-cli-platform": "~0.22.0",
+    "@babel/plugin-transform-react-jsx": "^7.28.6",
     "@react-native-community/cli": "11.3.2",
     "@react-native/eslint-config": "0.72.2",
     "@react-native/metro-config": "^0.72.6",

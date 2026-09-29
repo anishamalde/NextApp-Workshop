@@ -6,8 +6,11 @@
 module.exports = {
   presets: [
     [
-      'module:metro-react-native-babel-preset',      
+      'module:metro-react-native-babel-preset',
+      // W3C Media needs the automatic JSX runtime
+      {useTransformReactJSXExperimental: true},
     ],
     'module:@amazon-devices/kepler-module-resolver-preset', // Enables usage of VegaModuleResolverPreset
-  ]
+  ],
+  plugins: [['@babel/plugin-transform-react-jsx', {runtime: 'automatic'}]],
 };

@@ -23,36 +23,25 @@ export const tiles: TileData[] = [
     icon: require('../assets/home.png'),
   },
   {
-    id: 'get-started',
-    label: 'Get\nstarted',
-    accessibilityLabel: 'Get started',
-    description: (
-      <>
-        Edit <Text style={descStyles.bold}>App.tsx</Text> for live changes.
-        {'\n'}Not seeing updates? Check Fast Refresh is enabled.
-      </>
-    ),
+    id: 'animation',
+    label: 'Animated\nDemo',
+    accessibilityLabel: 'Animated Demo',
+    description: 'A Lottie animation demo powered by React Native.',
     icon: require('../assets/get-started.png'),
   },
   {
-    id: 'debug',
-    label: 'Test &\nDebug',
-    accessibilityLabel: 'Test and Debug',
+    id: 'movies',
+    label: 'Movies',
+    accessibilityLabel: 'Movies',
     description:
-      "Press 'd' in the Metro terminal for the developer menu, or debug via Chrome Dev Tools in Vega Studio.",
+      'A horizontal list of movies fetched from a public endpoint. FlatList on Expo TV and web, Carousel on Vega.',
     icon: require('../assets/debug.png'),
   },
   {
-    id: 'learn-more',
-    label: 'Learn\nmore',
-    accessibilityLabel: 'Learn more',
-    description: (
-      <>
-        Read the docs at{' '}
-        <Text style={descStyles.bold}>developer.amazon.com</Text> or join the
-        community forums.
-      </>
-    ),
+    id: 'api-demo',
+    label: 'API\nDemo',
+    accessibilityLabel: 'API Demo',
+    description: 'Press select to fetch a random joke from the API.',
     icon: require('../assets/learn-more.png'),
   },
 ];

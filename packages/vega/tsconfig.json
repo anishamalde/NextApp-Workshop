@@ -8,7 +8,8 @@
             "react": ["node_modules/@types/react"],
             "react-native": ["node_modules/react-native"],
             "@amazon-devices/*": ["node_modules/@amazon-devices/*"],
-            "lottie-react-native": ["node_modules/@amazon-devices/lottie-react-native"]
+            "lottie-react-native": ["node_modules/@amazon-devices/lottie-react-native"],
+            "react-native-video": ["../expotv/node_modules/react-native-video"]
         },
     },
 }

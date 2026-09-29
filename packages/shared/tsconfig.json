@@ -9,6 +9,7 @@
       "react-native": ["../vega/node_modules/react-native"],
       "react": ["../vega/node_modules/@types/react"],
       "@amazon-devices/*": ["../vega/node_modules/@amazon-devices/*"],
+      "react-native-video": ["../expotv/node_modules/react-native-video"],
       "lottie-react-native": ["../vega/node_modules/@amazon-devices/lottie-react-native"]
     },
     "strict": true,

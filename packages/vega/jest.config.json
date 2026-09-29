@@ -16,7 +16,8 @@
     "node"
   ],
   "moduleNameMapper": {
-    "^~/(.*)$": "<rootDir>/src/$1"
+    "^~/(.*)$": "<rootDir>/src/$1",
+    "^react-native-video$": "<rootDir>/test/__mocks__/react-native-video.js"
   },
   "modulePaths": [
     "<rootDir>/src",
