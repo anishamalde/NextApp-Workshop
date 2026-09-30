@@ -44,6 +44,13 @@ yarn expotv:web
 
 If Metro fails to resolve dependencies, check that `watchFolders` and `nodeModulesPaths` are correctly configured in the Metro config. The monorepo uses `react-native-monorepo-tools` to handle this.
 
+### Metro resolves `react` to `@types/react`
+
+If Metro resolves the runtime `react` module to `@types/react`, check the
+TypeScript path mappings. Do not map `react` or `react/jsx-runtime` to type-only
+packages. Keep those mappings out of Metro resolution while preserving the
+existing `@/*` source alias.
+
 ### Vega build issues
 
 Make sure the Vega CLI tools are installed and configured correctly.
