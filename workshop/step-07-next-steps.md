@@ -1,6 +1,6 @@
 # Next steps: Build a streaming TV experience with an AI prompt
 
-In this optional next step, you'll use an AI coding assistant to turn the workshop app into a small streaming-style TV experience.
+In this step, you'll extend the app by using an AI coding assistant to turn the workshop app into a small streaming-style TV experience.
 
 The prompt also leverages Amazon Devices Builder Tools (ADBT) so the assistant can build, launch, and validate the Vega app.
 
