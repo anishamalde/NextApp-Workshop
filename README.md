@@ -13,7 +13,7 @@ You start with a working monorepo that already has a simple tile-based UI. The p
 - A shared API demo that fetches data from a public endpoint
 - A movie list rendered with `FlatList` on web, Android TV, and Apple TV, and the Vega `Carousel` on Fire TV
 - A UI-fluidity comparison between `FlatList` and the Vega Carousel on a physical device
-- An optional prompt-driven streaming TV next step
+- An additional step to use a prompt to add more TV features 
 - The same app running on multiple TV platforms and the web
 
 Along the way you'll learn:
