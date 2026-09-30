@@ -2,12 +2,14 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "lib": ["ES2020"],
     "jsx": "react-native",
     "paths": {
       "react-native": ["../vega/node_modules/react-native"],
-      "react": ["../vega/node_modules/@types/react"]
+      "react": ["../vega/node_modules/@types/react"],
+      "@amazon-devices/*": ["../vega/node_modules/@amazon-devices/*"],
+      "lottie-react-native": ["../vega/node_modules/@amazon-devices/lottie-react-native"]
     },
     "strict": true,
     "esModuleInterop": true,
