@@ -3,37 +3,21 @@
   "transform": {
     "^.+\\.tsx?$": "ts-jest"
   },
-  "setupFiles": [
-    "./node_modules/@amazon-devices/react-native-kepler/jest/setup.js"
-  ],
+  "setupFiles": ["./node_modules/@amazon-devices/react-native-kepler/jest/setup.js"],
+  "setupFilesAfterEnv": ["../shared/jest.setup.js"],
   "testRegex": "/test/.*\\.(test|spec)\\.(ts|tsx|js)$",
-  "moduleFileExtensions": [
-    "ts",
-    "tsx",
-    "js",
-    "jsx",
-    "json",
-    "node"
-  ],
+  "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
   "moduleNameMapper": {
     "^~/(.*)$": "<rootDir>/src/$1"
   },
-  "modulePaths": [
-    "<rootDir>/src",
-    "<rootDir>/node_modules"
-  ],
+  "modulePaths": ["<rootDir>/src"],
   "roots": [
     "<rootDir>/src/",
     "<rootDir>/test/",
     "<rootDir>/node_modules/"
   ],
   "collectCoverage": false,
-  "coverageReporters": [
-    "json",
-    "json-summary",
-    "lcov",
-    "text"
-  ],
+  "coverageReporters": ["json", "json-summary", "lcov", "text"],
   "collectCoverageFrom": [
     "src/**/*",
     "!**/index.{ts,js,tsx}",
@@ -41,7 +25,7 @@
     "!src/**/*.d.ts"
   ],
   "transformIgnorePatterns": [
-    "node_modules/(?![\\w\\-_]+)/node_modules/(?!react-native|@react-native)/"
+    "node_modules/(?!((jest-)?react-native|@react-native(-community)?|@amazon-devices/react-native-kepler|react-native-safe-area-context))"
   ],
   "coverageDirectory": ".tmp/coverage",
   "globals": {
